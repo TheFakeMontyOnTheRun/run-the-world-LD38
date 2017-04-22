@@ -110,9 +110,27 @@ namespace odb {
                 rect = {0, 241, 640, 240};
                 SDL_FillRect(video, &rect, SDL_MapRGB(video->format, 0, 255, 0));
 
+
+                int delta = 0;
+
+
+                if (game.shape == ')') {
+                    delta = -1;
+                }
+
+                if ( game.shape == '(') {
+                    delta = 1;
+                }
+
+
                 for ( int y = 0; y < 240; ++y ) {
-                    rect = {320 - (240 - y) - ( ((240 - y) * game.x) / 240), 240 + (240 - y), 32 + ((240 - y) * 2), 1};
-                    SDL_FillRect(video, &rect, SDL_MapRGB(video->format, 64, 64, 64));
+                    int roadX = ( (240 * 10 * delta) / (240-y) ) +  320 - (240 - y) - ( ((240 - y) * game.x) / 240);
+                    int roadDeltaX = 32 + ((240 - y) * 2);
+                    int shade = ( (240 - y) / 4);
+
+                    rect = { roadX, 240 + (240 - y), roadDeltaX, 1};
+                    SDL_FillRect(video, &rect, SDL_MapRGB(video->format, 64 + shade, 64 + shade, 64 + shade));
+
                 }
 
                 rect = SDL_Rect{0, 0, 80, 40};
