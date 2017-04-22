@@ -110,10 +110,10 @@ namespace odb {
                 rect = {0, 240, 640, 240};
                 SDL_FillRect(video, &rect, SDL_MapRGB(video->format, 0, 255, 0));
 
-
-                rect = {160, 240, 320, 240};
-                SDL_FillRect(video, &rect, SDL_MapRGB(video->format, 64, 64, 64));
-
+                for ( int y = 0; y < 240; ++y ) {
+                    rect = {320 - (240 - y), 240 + (240 - y), 32 + ((240 - y) * 2), 240};
+                    SDL_FillRect(video, &rect, SDL_MapRGB(video->format, 64, 64, 64));
+                }
 
                 rect = SDL_Rect{0, 0, 80, 40};
                 rect.x = 320 + game.x;

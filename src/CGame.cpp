@@ -17,22 +17,24 @@ namespace odb {
     }
 
     void CGame::tick(long ms) {
-        timeEllapsed += ms;;
+        timeEllapsed += ms;
+
+        x += xSpeed;
     }
 
     CControlCallback CGame::getKeyPressedCallback() {
         return [&](ECommand command) {
             if (command == ECommand::kLeft) {
                 std::cout << "left pressed" << std::endl;
+                xSpeed = -1;
             }
 
             if (command == ECommand::kRight) {
                 std::cout << "Right pressed" << std::endl;
-                x++;
+                xSpeed = 1;
             }
             if (command == ECommand::kUp) {
                 std::cout << "up pressed" << std::endl;
-                x--;
             }
 
             if (command == ECommand::kDown) {
@@ -47,6 +49,8 @@ namespace odb {
 
     CControlCallback CGame::getKeyReleasedCallback() {
         return [&](ECommand command) {
+
+            xSpeed = 0;
 
             switch (gameState) {
                 case EGameState::kGame:
