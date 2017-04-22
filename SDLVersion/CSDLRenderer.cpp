@@ -111,7 +111,7 @@ namespace odb {
                 SDL_FillRect(video, &rect, SDL_MapRGB(video->format, 0, 255, 0));
 
                 for ( int y = 0; y < 240; ++y ) {
-                    rect = {160 - (y / 2), 240 + y, 320 + y, 240};
+                    rect = {320 - (240 - y), 240 + (240 - y), 32 + ((240 - y) * 2), 240};
                     SDL_FillRect(video, &rect, SDL_MapRGB(video->format, 64, 64, 64));
                 }
 
