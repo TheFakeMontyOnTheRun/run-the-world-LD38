@@ -104,19 +104,19 @@ namespace odb {
             case CGame::EGameState::kGameOver:
             case CGame::EGameState::kGame:
 
-                rect = {0, 0, 640, 240};
+                rect = {0, 0, 640, 241};
                 SDL_FillRect(video, &rect, SDL_MapRGB(video->format, 0, 0, 255));
 
-                rect = {0, 240, 640, 240};
+                rect = {0, 241, 640, 240};
                 SDL_FillRect(video, &rect, SDL_MapRGB(video->format, 0, 255, 0));
 
                 for ( int y = 0; y < 240; ++y ) {
-                    rect = {320 - (240 - y), 240 + (240 - y), 32 + ((240 - y) * 2), 240};
+                    rect = {320 - (240 - y) - ( ((240 - y) * game.x) / 240), 240 + (240 - y), 32 + ((240 - y) * 2), 1};
                     SDL_FillRect(video, &rect, SDL_MapRGB(video->format, 64, 64, 64));
                 }
 
                 rect = SDL_Rect{0, 0, 80, 40};
-                rect.x = 320 + game.x;
+                rect.x = 320 + (game.x );
                 rect.y = 440;
 
                 SDL_FillRect(video, &rect, SDL_MapRGB(video->format, 255, 0, 0));

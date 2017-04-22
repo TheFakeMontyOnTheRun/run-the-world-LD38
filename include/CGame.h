@@ -14,6 +14,8 @@ namespace odb {
         int x = 0;
         int y = 0;
         int xSpeed = 0;
+        int height = 0;
+        int ySpeed = 0;
 
         explicit CGame();
 
