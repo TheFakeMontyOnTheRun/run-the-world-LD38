@@ -18,7 +18,6 @@ namespace odb {
         int xSpeed = 0;
         int height = 0;
         int ySpeed = 0;
-        char shape = '|';
 
         std::array<char, 10>  track = {'|','(','|',')','|','(','|', ')', '(', ')'};
 

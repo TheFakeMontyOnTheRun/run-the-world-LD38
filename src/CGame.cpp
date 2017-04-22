@@ -44,12 +44,10 @@ namespace odb {
             }
             if (command == ECommand::kUp) {
                 std::cout << "up pressed" << std::endl;
-                shape = ')';
             }
 
             if (command == ECommand::kDown) {
                 std::cout << "down pressed" << std::endl;
-                shape = '(';
             }
 
             if (command == ECommand::kFire1) {
@@ -65,7 +63,6 @@ namespace odb {
 
             switch (gameState) {
                 case EGameState::kGame:
-                    shape = '|';
 
                     if (command == ECommand::kLeft) {
                         std::cout << "left released" << std::endl;
