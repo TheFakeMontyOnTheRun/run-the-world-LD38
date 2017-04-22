@@ -113,6 +113,8 @@ namespace odb {
         vec2 v2(320 + (xz * 640), 240 - (yz * 480));
         return v2;
     }
+
+
     void CRenderer::render(const CGame &game, long ms) {
 
         SDL_Rect rect;
@@ -127,55 +129,54 @@ namespace odb {
                 SDL_FillRect(video, &rect, SDL_MapRGB(video->format, 0, 0, 255));
 
 
-
                 int delta = 0;
 
-
-                if (game.track[ game.elementIndex ] == ')') {
+                char shape = game.track[game.elementIndex];
+                if (shape == ')') {
                     delta = -1;
                 }
 
-                if ( game.track[ game.elementIndex ] == '(') {
+                if (shape == '(') {
                     delta = 1;
                 }
 
                 int distance = 0;
 
-                if ( game.distanceToNextElement > 50 ) {
-                    distance = ( 100 - game.distanceToNextElement );
+                if (game.distanceToNextElement > 50) {
+                    distance = (100 - game.distanceToNextElement);
                 } else {
-                    distance = ( game.distanceToNextElement );
+                    distance = (game.distanceToNextElement);
                 }
 
 
+                int perspectiveFactor = 0;
+                int height = 240;
 
-                for ( int y = 1; y < 240; ++y ) {
-                    int curveFactor = ( (240 * distance * delta) / y );
-                    int cameraFactor = - ( (y * game.x) / 240);
-                    int roadX =  curveFactor  + 320 - (y) + cameraFactor;
-                    int roadDeltaX = 32 + (y * 2);
-                    int shade = ( y / 4);
-                    bool stripe = (( ( 240 / y) % 2)) == 0;
+                for (int y = height; y > 0; y--) {
+                    perspectiveFactor = y;
+
+                    int curveFactor = ((height * distance * delta) / y);
+                    int cameraFactor = -((y * game.x) / height);
+                    int roadX = curveFactor + 320 - (perspectiveFactor);
+                    int roadDeltaX = (perspectiveFactor * 2);
+                    int shade = (y / 4);
 
                     rect = {0, y, 640, 1};
                     SDL_FillRect(video, &rect, SDL_MapRGB(video->format, 0, 0, 128 + shade / 2));
 
-                    if ( stripe ) {
-                        shade = shade * 4;
-                    }
-
-                    rect = {0, 240 + y, 640, 1};
+                    rect = {0, height + y, 640, 1};
                     SDL_FillRect(video, &rect, SDL_MapRGB(video->format, 0, 128 + shade / 2, 0));
 
-                    rect = { roadX, 240 + y, roadDeltaX, 1};
-
-
+                    rect = {roadX, height + y, roadDeltaX, 1};
                     SDL_FillRect(video, &rect, SDL_MapRGB(video->format, 64 + shade, 64 + shade, 64 + shade));
 
                 }
 
+
+
+
                 rect = SDL_Rect{0, 0, 80, 40};
-                rect.x = 320 + (game.x );
+                rect.x = 320 + (game.x);
                 rect.y = 440;
 
                 SDL_FillRect(video, &rect, SDL_MapRGB(video->format, 255, 0, 0));
