@@ -1,6 +1,8 @@
 #ifndef CGAME_H
 #define CGAME_H
 
+#include "Common.h"
+
 namespace odb {
     class CGame {
     public:
@@ -16,6 +18,7 @@ namespace odb {
         int xSpeed = 0;
         int height = 0;
         int ySpeed = 0;
+        char shape = '|';
 
         explicit CGame();
 
