@@ -89,6 +89,30 @@ namespace odb {
         }
     }
 
+    struct vec3 {
+        vec3(float aX, float aY, float aZ) : x(aX), y(aY), z(aZ) {
+        }
+
+        float x = 0;
+        float y = 0;
+        float z = 0;
+    };
+
+    struct vec2 {
+        vec2(float aX, float aY) : x(aX), y(aY) {
+        }
+
+        float x = 0;
+        float y = 0;
+    };
+
+    vec2 project(vec3 v) {
+        float xz = v.x / (1.0f - v.z);
+        float yz = v.y / (1.0f - v.z);
+
+        vec2 v2(320 + (xz * 640), 240 - (yz * 480));
+        return v2;
+    }
     void CRenderer::render(const CGame &game, long ms) {
 
         SDL_Rect rect;
