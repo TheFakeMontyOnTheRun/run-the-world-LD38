@@ -20,9 +20,16 @@ namespace odb {
         int ySpeed = 0;
         char shape = '|';
 
+        std::array<char, 10>  track = {'|','(','|',')','|','(','|', ')', '(', ')'};
+
+        int distanceToNextElement = 20;
+
+        int elementIndex = 0;
+
         explicit CGame();
 
         long timeEllapsed = 0;
+        long timeInSegment = 0;
 
         void tick(long ms);
 

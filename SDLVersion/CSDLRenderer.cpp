@@ -107,19 +107,26 @@ namespace odb {
                 int delta = 0;
 
 
-                if (game.shape == ')') {
+                if (game.track[ game.elementIndex ] == ')') {
                     delta = -1;
                 }
 
-                if ( game.shape == '(') {
+                if ( game.track[ game.elementIndex ] == '(') {
                     delta = 1;
                 }
 
+                int distance = 0;
+
+                if ( game.distanceToNextElement > 50 ) {
+                    distance = ( 100 - game.distanceToNextElement );
+                } else {
+                    distance = ( game.distanceToNextElement );
+                }
 
 
 
                 for ( int y = 0; y < 240; ++y ) {
-                    int roadX = ( (240 * 10 * delta) / (240-y) ) +  320 - (240 - y) - ( ((240 - y) * game.x) / 240);
+                    int roadX = ( (240 * distance * delta) / (240-y) ) +  320 - (240 - y) - ( ((240 - y) * game.x) / 240);
                     int roadDeltaX = 32 + ((240 - y) * 2);
                     int shade = ( (240 - y) / 4);
 

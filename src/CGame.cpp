@@ -1,5 +1,5 @@
 #include <functional>
-
+#include <array>
 #include <iostream>
 #include <random>
 #include "Common.h"
@@ -18,6 +18,15 @@ namespace odb {
 
     void CGame::tick(long ms) {
         timeEllapsed += ms;
+        timeInSegment += ms;
+
+        distanceToNextElement = 100 - (20 * timeInSegment/1000);
+
+        if (distanceToNextElement < 0 ) {
+            distanceToNextElement = 100;
+            timeInSegment = 0;
+            elementIndex = ( elementIndex + 1) % track.size(); //len track
+        }
 
         x += xSpeed;
     }
