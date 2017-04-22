@@ -170,6 +170,21 @@ namespace odb {
                     rect = {roadX, height + y, roadDeltaX, 1};
                     SDL_FillRect(video, &rect, SDL_MapRGB(video->format, 64 + shade, 64 + shade, 64 + shade));
 
+                    float curve = (distance / 20.0f) * delta * y * y / 50.0f;
+
+                    auto v0 = project(vec3(-0.4 + curve, 0.5f, -y));
+                    rect = {(int) v0.x, (int) v0.y, 3, 3};
+                    SDL_FillRect(video, &rect, SDL_MapRGB(video->format, 255, 255, 255));
+
+
+                    auto v1 = project(vec3(0.4 + curve, 0.5f, -y));
+                    rect = {(int) v1.x, (int) v1.y, 5, 5};
+                    SDL_FillRect(video, &rect, SDL_MapRGB(video->format, 255, 255, 0));
+
+                    auto v2 = project(vec3(curve, -0.5f, -y));
+                    rect = {(int) v2.x, (int) v2.y, 5, 5};
+                    SDL_FillRect(video, &rect, SDL_MapRGB(video->format, 255, 0, 0));
+
                 }
 
 
