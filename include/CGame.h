@@ -19,7 +19,8 @@ namespace odb {
         int height = 0;
         int ySpeed = 0;
 
-        std::array<char, 10>  track = {'|','(','|',')','|','(','|', ')', '(', ')'};
+        std::array<char, 10>  track =   {'|' , '(', '|', ')', '|' , '(', '|', ')', '(' , ')'};
+        std::array<char, 10>  slopes = {'_' , '/', '_', '_', '\\', '_', '/', '_', '\\', '_'};
 
         int distanceToNextElement = 20;
 
