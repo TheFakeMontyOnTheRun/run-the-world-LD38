@@ -129,15 +129,21 @@ namespace odb {
                     int roadX = ( (240 * distance * delta) / (240-y) ) +  320 - (240 - y) - ( ((240 - y) * game.x) / 240);
                     int roadDeltaX = 32 + ((240 - y) * 2);
                     int shade = ( (240 - y) / 4);
+                    bool stripe = (( ( (240 ) / ( 240 - y )) % 2)) == 0;
 
                     rect = {0, (240 - y), 640, 1};
                     SDL_FillRect(video, &rect, SDL_MapRGB(video->format, 0, 0, 128 + shade / 2));
 
+                    if ( stripe ) {
+                        shade = shade * 4;
+                    }
 
                     rect = {0, 240 + (240 - y), 640, 1};
                     SDL_FillRect(video, &rect, SDL_MapRGB(video->format, 0, 128 + shade / 2, 0));
 
                     rect = { roadX, 240 + (240 - y), roadDeltaX, 1};
+
+
                     SDL_FillRect(video, &rect, SDL_MapRGB(video->format, 64 + shade, 64 + shade, 64 + shade));
 
                 }
