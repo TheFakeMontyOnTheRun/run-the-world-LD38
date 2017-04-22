@@ -30,7 +30,7 @@ namespace odb {
 
         long timeEllapsed = 0;
         long timeInSegment = 0;
-
+        long distanceRan = 0;
         void tick(long ms);
 
         void reset();

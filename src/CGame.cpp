@@ -19,7 +19,7 @@ namespace odb {
     void CGame::tick(long ms) {
         timeEllapsed += ms;
         timeInSegment += ms;
-
+        distanceRan += 20 * ms;
         distanceToNextElement = 100 - (20 * timeInSegment/1000);
 
         if (distanceToNextElement < 0 ) {
