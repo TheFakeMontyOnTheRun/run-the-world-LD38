@@ -18,17 +18,17 @@ namespace odb {
 
     void CGame::tick(long ms) {
         timeEllapsed += ms;
-        timeInSegment += ms;
-        distanceRan += 20 * ms;
-        distanceToNextElement = 100 - (20 * timeInSegment/1000);
+        distanceRan += carSpeed * ms;
+        distanceToNextElement -= carSpeed * ms/1000.0f;
 
-        if (distanceToNextElement < 0 ) {
+        if (distanceToNextElement <= 0 ) {
             distanceToNextElement = 100;
-            timeInSegment = 0;
             elementIndex = ( elementIndex + 1) % track.size(); //len track
+            std::cout << "entering " << track[ elementIndex ] << " with slope " << slopes[ elementIndex ] << std::endl;
         }
 
-        x += xSpeed;
+        std::cout << "distanceRan: " << distanceRan << std::endl;
+        x += xSpeed * carSpeed;
     }
 
     CControlCallback CGame::getKeyPressedCallback() {

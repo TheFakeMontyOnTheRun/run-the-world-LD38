@@ -13,23 +13,19 @@ namespace odb {
 
         EGameState gameState = EGameState::kTitleScreen;
 
-        int x = 0;
-        int y = 0;
-        int xSpeed = 0;
-        int height = 0;
-        int ySpeed = 0;
+        float x = 0;
+        float xSpeed = 0;
+        int carSpeed = 20;
+        std::array<char, 10>  track =   {'(' , '|', ')', ')', '|' , ')', ')', ')', ')' , ')'};
+        std::array<char, 10>  slopes = {'_' , '/', '_', '\\', '_', '/', '_', '\\', '_', '_'};
 
-        std::array<char, 10>  track =   {'|' , '(', '|', ')', '|' , '(', '|', ')', '(' , ')'};
-        std::array<char, 10>  slopes = {'_' , '/', '_', '_', '\\', '_', '/', '_', '\\', '_'};
-
-        int distanceToNextElement = 20;
+        int distanceToNextElement = 100;
 
         int elementIndex = 0;
 
         explicit CGame();
 
         long timeEllapsed = 0;
-        long timeInSegment = 0;
         long distanceRan = 0;
         void tick(long ms);
 
