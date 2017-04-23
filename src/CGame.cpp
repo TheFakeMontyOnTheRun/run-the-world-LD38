@@ -27,8 +27,18 @@ namespace odb {
             std::cout << "entering " << track[ elementIndex ] << " with slope " << slopes[ elementIndex ] << std::endl;
         }
 
-        std::cout << "distanceRan: " << distanceRan << std::endl;
-        x += xSpeed * carSpeed;
+        std::cout << "speed: " << carSpeed << std::endl;
+        x += xSpeed * carSpeed * 0.5f;
+
+        if ( track[ elementIndex ] == ')') {
+            x+= 0.35f * carSpeed;
+        } else if ( track[ elementIndex ] == '(') {
+            x-= 0.35f * carSpeed;
+        }
+
+        if ( x < -160 || x > 160 ) {
+
+        }
     }
 
     CControlCallback CGame::getKeyPressedCallback() {
