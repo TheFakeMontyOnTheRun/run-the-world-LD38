@@ -19,9 +19,11 @@ namespace odb {
         float xSpeed = 0;
         float mHeading = 0;
         int carSpeed = 0;
-        std::array<char, 10>  track =   {'(' , ')', ')', ')', '|' , ')', ')', ')', ')' , ')'};
-        std::array<char, 10>  slopes = {'_' , '\\', '_', '\\', '_', '/', '_', '\\', '_', '_'};
         int zone = 0;
+        long timeLeft = 60000;
+        //20 seconds per segment is quite fair
+        std::array<char, 3>  track =   {'(' , ')', ')'};
+        std::array<char, 3>  slopes = {'/' , '\\', '_' };
 
         int distanceToNextElement = kSegmentLengthInMeters;
 
