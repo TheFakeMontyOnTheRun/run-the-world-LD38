@@ -26,9 +26,15 @@ namespace odb {
         distanceRan += distanceSinceLastTick;
         distanceToNextElement -= distanceSinceLastTick;
 
+
         if (distanceToNextElement <= 0 ) {
             distanceToNextElement = kSegmentLengthInMeters;
-            elementIndex = ( elementIndex + 1) % track.size(); //len track
+            elementIndex++;
+        }
+
+        if ( elementIndex >= track.size() ) {
+            elementIndex = 0;
+            ++zone;
         }
 
         x += xSpeed * carSpeed * 0.2f;
