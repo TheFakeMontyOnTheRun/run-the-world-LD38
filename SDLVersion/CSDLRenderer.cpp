@@ -112,7 +112,7 @@ namespace odb {
                 float roadWidth = 1.0f;
                 char shape = game.track[game.elementIndex];
                 char slope = game.slopes[game.elementIndex];
-                auto camera = Vec2( 0.5f * (game.x - 320)/ 640.0f, 0.2f );
+                auto camera = Vec2( 0.5f * (game.x)/ 640.0f, 0.2f );
 
                 if (shape == ')') {
                     shapeDelta = -1;
@@ -186,7 +186,7 @@ namespace odb {
                     previousRight = rightPoint;
                 }
 
-                auto car = project(Vec3( (game.x - 320)/ 640.0f, 0.0f, 0.5f), camera);
+                auto car = project(Vec3( (game.x)/ 640.0f, 0.0f, 0.5f), camera);
                 rect = { car.x - 40, car.y - 20, 80, 40};
 
                 SDL_FillRect(video, &rect, SDL_MapRGB(video->format, 255, 0, 0));
