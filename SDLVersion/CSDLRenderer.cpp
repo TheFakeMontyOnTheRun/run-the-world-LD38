@@ -107,7 +107,7 @@ namespace odb {
             case CGame::EGameState::kVictory:
             case CGame::EGameState::kGameOver:
             case CGame::EGameState::kGame:
-
+                int numberOfStripeShades = 4;
                 int shapeDelta = 0;
                 float roadWidth = 1.0f;
                 char shape = game.track[game.elementIndex];
@@ -132,57 +132,58 @@ namespace odb {
                     slopeDelta = -1;
                 }
 
-                int distance = 0;
+                int distanceToCurrentShape = 0;
 
                 if (game.distanceToNextElement > 50) {
-                    distance = (100 - game.distanceToNextElement);
+                    distanceToCurrentShape = (100 - game.distanceToNextElement);
                 } else {
-                    distance = (game.distanceToNextElement);
+                    distanceToCurrentShape = (game.distanceToNextElement);
                 }
 
-                int height = 480 / 2;
+                int halfScreenHeight = 480 / 2;
 
-                auto addedLines = ( distance / 50.0f * 100 * slopeDelta  );
+                auto slopeAddedLines = ( 2 * distanceToCurrentShape * slopeDelta  );
 
-                for (int y = 1; y < height - addedLines; ++y ) {
+                for (int y = 1; y < halfScreenHeight - slopeAddedLines; ++y ) {
                     int shade = (y / 4);
-
                     rect = {0, y, 640, 1};
                     SDL_FillRect(video, &rect, SDL_MapRGB(video->format, 0, 0, 128 + shade / 2));
                 }
 
-                for (int y = 0; y < height + addedLines + 1; ++y ) {
+                for (int y = 0; y < halfScreenHeight + slopeAddedLines + 1; ++y ) {
                     int shade = (y / 4);
-
-                    rect = {0, ( height - addedLines ) + y, 640, 1};
+                    rect = {0, ( halfScreenHeight - slopeAddedLines ) + y, 640, 1};
                     SDL_FillRect(video, &rect, SDL_MapRGB(video->format, 0, 128 + shade / 2, 0));
                 }
 
-                Vec2 p0(-1, -1);
-                Vec2 p1(-1, -1);
-                int count = 0;
-                float initialSlope = distance * slopeDelta;
-                float acc = initialSlope;
-                float deltaAcc =  (-initialSlope) / 480.0f;
+                Vec2 previousLeft(-1, -1);
+                Vec2 previousRight(-1, -1);
 
-                for (float y = height; y > 0; y -= (0.5f )) {
-                    count = ( count + 1) % 1024;
+                int shadingStripesCount = 0;
 
-                    acc += deltaAcc;
+                float initialSlope = distanceToCurrentShape * slopeDelta;
+                float currentStripeHeight = initialSlope;
+                float stripeHeightDelta =  (-initialSlope) / 480.0f;
 
-                    float curve = (distance / 20.0f) * shapeDelta * y * y / 50.0f;
-                    auto v0 = project(Vec3(-( roadWidth / 2.0f ) + curve, -0.5f + acc, -y + 0.5f), camera);
-                    auto v1 = project(Vec3( (roadWidth / 2.0f ) + curve, -0.5f + acc, -y + 0.5f), camera);
+                for (float y = halfScreenHeight; y > 0; y -= (0.5f )) {
+                    shadingStripesCount = ( shadingStripesCount + 1) % 1024;
 
-                    if ( p0.y < 0 ) {
-                        p0 = v0;
-                        p1 = v1;
+                    currentStripeHeight += stripeHeightDelta;
+
+                    float curve = (distanceToCurrentShape / 20.0f) * shapeDelta * y * y / 50.0f;
+                    auto leftPoint = project(Vec3(-( roadWidth / 2.0f ) + curve, -0.5f + currentStripeHeight, -y + 0.5f), camera);
+                    auto rightPoint = project(Vec3( (roadWidth / 2.0f ) + curve, -0.5f + currentStripeHeight, -y + 0.5f), camera);
+
+                    //if it's valid
+                    if ( previousLeft.y < 0 ) {
+                        previousLeft = leftPoint;
+                        previousRight = rightPoint;
                     }
 
-                    fill( v0.x, v1.x, v0.y, p0.x, p1.x, p0.y, (- count + ( game.distanceRan / 1000 ) ) % 4 );
+                    fill( leftPoint.x, rightPoint.x, leftPoint.y, previousLeft.x, previousRight.x, previousLeft.y, (- shadingStripesCount + ( game.distanceRan / 1000 ) ) % numberOfStripeShades );
 
-                    p0 = v0;
-                    p1 = v1;
+                    previousLeft = leftPoint;
+                    previousRight = rightPoint;
                 }
 
                 auto car = project(Vec3( (game.x - 320)/ 640.0f, 0.0f, 0.5f), camera);
