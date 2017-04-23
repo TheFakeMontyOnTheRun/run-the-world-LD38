@@ -125,10 +125,6 @@ namespace odb {
             case CGame::EGameState::kGameOver:
             case CGame::EGameState::kGame:
 
-                rect = {0, 0, 640, 480};
-                SDL_FillRect(video, &rect, SDL_MapRGB(video->format, 0, 0, 0));
-
-
                 int delta = 0;
 
                 char shape = game.track[game.elementIndex];
@@ -162,19 +158,7 @@ namespace odb {
                     distance = (game.distanceToNextElement);
                 }
 
-
-                int perspectiveFactor = 0;
-                int subida = 2;
-                int descida = 1;
                 int height = 240;
-                vec2 p0(-1, -1);
-                vec2 p1(-1, -1);
-
-                int count = 0;
-
-                float initialSlope = distance * slopeDelta;
-                float acc = initialSlope;
-                float deltaAcc =  (-initialSlope) / 480.0f;
 
                 auto addedLines = ( distance / 50.0f * 80 * slopeDelta  );
 
@@ -185,27 +169,26 @@ namespace odb {
                     SDL_FillRect(video, &rect, SDL_MapRGB(video->format, 0, 0, 128 + shade / 2));
                 }
 
-                for (int y = 1; y < 240 + addedLines; ++y ) {
+                for (int y = 0; y < 240 + addedLines + 1; ++y ) {
                     int shade = (y / 4);
 
                     rect = {0, ( 240 - addedLines ) + y, 640, 1};
                     SDL_FillRect(video, &rect, SDL_MapRGB(video->format, 0, 128 + shade / 2, 0));
                 }
 
+                vec2 p0(-1, -1);
+                vec2 p1(-1, -1);
+                int count = 0;
+                float initialSlope = distance * slopeDelta;
+                float acc = initialSlope;
+                float deltaAcc =  (-initialSlope) / 480.0f;
 
                 for (float y = height; y > 0; y -= (0.5f )) {
                     count = ( count + 1) % 1024;
 
-                    std::cout << game.distanceRan << std::endl;
-
                     acc += deltaAcc;
 
-
-//                    rect = {roadX, height + y, roadDeltaX, 1};
-//                    SDL_FillRect(video, &rect, SDL_MapRGB(video->format, 64 + shade, 64 + shade, 64 + shade));
-
                     float curve = (distance / 20.0f) * delta * y * y / 50.0f;
-
 
                     auto v0 = project(vec3(-0.4 + curve, -0.5f + acc, -y + 0.5f));
                     auto v1 = project(vec3(0.4 + curve, -0.5f + acc, -y + 0.5f));
