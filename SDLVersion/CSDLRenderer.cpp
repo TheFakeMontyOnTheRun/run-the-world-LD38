@@ -89,28 +89,11 @@ namespace odb {
         }
     }
 
-    struct vec3 {
-        vec3(float aX, float aY, float aZ) : x(aX), y(aY), z(aZ) {
-        }
+    Vec2 project(Vec3 v, Vec2 camera) {
+        float xz = (v.x - camera.x) / (1.0f - v.z);
+        float yz = (v.y - camera.y) / (1.0f - v.z);
 
-        float x = 0;
-        float y = 0;
-        float z = 0;
-    };
-
-    struct vec2 {
-        vec2(float aX, float aY) : x(aX), y(aY) {
-        }
-
-        float x = 0;
-        float y = 0;
-    };
-
-    vec2 project(vec3 v) {
-        float xz = v.x / (1.0f - v.z);
-        float yz = v.y / (1.0f - v.z);
-
-        vec2 v2(320 + (xz * 640), 240 - (yz * 480));
+        Vec2 v2(320 + (xz * 640), 240 - (yz * 480));
         return v2;
     }
 
@@ -125,17 +108,18 @@ namespace odb {
             case CGame::EGameState::kGameOver:
             case CGame::EGameState::kGame:
 
-                int delta = 0;
-
+                int shapeDelta = 0;
+                float roadWidth = 1.0f;
                 char shape = game.track[game.elementIndex];
                 char slope = game.slopes[game.elementIndex];
+                auto camera = Vec2( 0.5f * (game.x - 320)/ 640.0f, 0.2f );
 
                 if (shape == ')') {
-                    delta = -1;
+                    shapeDelta = -1;
                 }
 
                 if (shape == '(') {
-                    delta = 1;
+                    shapeDelta = 1;
                 }
 
                 float slopeDelta = 0;
@@ -148,8 +132,6 @@ namespace odb {
                     slopeDelta = -1;
                 }
 
-
-
                 int distance = 0;
 
                 if (game.distanceToNextElement > 50) {
@@ -158,26 +140,26 @@ namespace odb {
                     distance = (game.distanceToNextElement);
                 }
 
-                int height = 240;
+                int height = 480 / 2;
 
-                auto addedLines = ( distance / 50.0f * 80 * slopeDelta  );
+                auto addedLines = ( distance / 50.0f * 100 * slopeDelta  );
 
-                for (int y = 1; y < 240 - addedLines; ++y ) {
+                for (int y = 1; y < height - addedLines; ++y ) {
                     int shade = (y / 4);
 
                     rect = {0, y, 640, 1};
                     SDL_FillRect(video, &rect, SDL_MapRGB(video->format, 0, 0, 128 + shade / 2));
                 }
 
-                for (int y = 0; y < 240 + addedLines + 1; ++y ) {
+                for (int y = 0; y < height + addedLines + 1; ++y ) {
                     int shade = (y / 4);
 
-                    rect = {0, ( 240 - addedLines ) + y, 640, 1};
+                    rect = {0, ( height - addedLines ) + y, 640, 1};
                     SDL_FillRect(video, &rect, SDL_MapRGB(video->format, 0, 128 + shade / 2, 0));
                 }
 
-                vec2 p0(-1, -1);
-                vec2 p1(-1, -1);
+                Vec2 p0(-1, -1);
+                Vec2 p1(-1, -1);
                 int count = 0;
                 float initialSlope = distance * slopeDelta;
                 float acc = initialSlope;
@@ -188,10 +170,9 @@ namespace odb {
 
                     acc += deltaAcc;
 
-                    float curve = (distance / 20.0f) * delta * y * y / 50.0f;
-
-                    auto v0 = project(vec3(-0.4 + curve, -0.5f + acc, -y + 0.5f));
-                    auto v1 = project(vec3(0.4 + curve, -0.5f + acc, -y + 0.5f));
+                    float curve = (distance / 20.0f) * shapeDelta * y * y / 50.0f;
+                    auto v0 = project(Vec3(-( roadWidth / 2.0f ) + curve, -0.5f + acc, -y + 0.5f), camera);
+                    auto v1 = project(Vec3( (roadWidth / 2.0f ) + curve, -0.5f + acc, -y + 0.5f), camera);
 
                     if ( p0.y < 0 ) {
                         p0 = v0;
@@ -204,9 +185,8 @@ namespace odb {
                     p1 = v1;
                 }
 
-                rect = SDL_Rect{0, 0, 80, 40};
-                rect.x = 320 + (game.x);
-                rect.y = 440;
+                auto car = project(Vec3( (game.x - 320)/ 640.0f, 0.0f, 0.5f), camera);
+                rect = { car.x - 40, car.y - 20, 80, 40};
 
                 SDL_FillRect(video, &rect, SDL_MapRGB(video->format, 255, 0, 0));
 
