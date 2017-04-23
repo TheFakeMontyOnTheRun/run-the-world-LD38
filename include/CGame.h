@@ -15,7 +15,7 @@ namespace odb {
 
         float x = 0;
         float xSpeed = 0;
-        int carSpeed = 20;
+        int carSpeed = 0;
         std::array<char, 10>  track =   {'(' , '|', ')', ')', '|' , ')', ')', ')', ')' , ')'};
         std::array<char, 10>  slopes = {'_' , '/', '_', '\\', '_', '/', '_', '\\', '_', '_'};
 
