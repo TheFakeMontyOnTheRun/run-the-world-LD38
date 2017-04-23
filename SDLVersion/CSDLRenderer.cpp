@@ -11,11 +11,22 @@
 namespace odb {
 
     SDL_Surface *video;
+    SDL_Surface *backdrop[3];
+
+    SDL_Surface *car[3];
 
     CRenderer::CRenderer(CControlCallback keyPressedCallback, CControlCallback keyReleasedCallback) :
             mOnKeyPressedCallback(keyPressedCallback), mOnKeyReleasedCallback(keyReleasedCallback) {
         SDL_Init(SDL_INIT_EVERYTHING);
         video = SDL_SetVideoMode(640, 480, 0, 0);
+        backdrop[0] = SDL_LoadBMP( "res/1.bmp" );
+        backdrop[1] = SDL_LoadBMP( "res/2.bmp" );
+        backdrop[2] = SDL_LoadBMP( "res/3.bmp" );
+
+        car[0] = SDL_LoadBMP( "res/lancia0.bmp" );
+        car[1] = SDL_LoadBMP( "res/lancia1.bmp" );
+        car[2] = SDL_LoadBMP( "res/lancia2.bmp" );
+
     }
 
     void CRenderer::sleep(long ms) {
@@ -144,11 +155,15 @@ namespace odb {
 
                 auto slopeAddedLines = ( 2 * CGame::kSlopeHeightInMeters * (distanceToCurrentShape/static_cast<float>(CGame::kSegmentLengthInMeters)) * slopeDelta  );
 
-                for (int y = 1; y < halfScreenHeight - slopeAddedLines; ++y ) {
-                    int shade = (y / 4);
-                    rect = {0, y, 640, 1};
-                    SDL_FillRect(video, &rect, SDL_MapRGB(video->format, 0, 0, 128 + shade / 2));
+                int modulus = static_cast<int>(game.mHeading * 640) % 640;
+
+                while ( modulus < 0 ) {
+                    modulus += 640;
                 }
+
+
+                drawBackdropForHeading( modulus, game.zone );
+
 
                 for (int y = 0; y < halfScreenHeight + slopeAddedLines + 1; ++y ) {
                     int shade = (y / 4);
@@ -188,11 +203,10 @@ namespace odb {
                     previousRight = rightPoint;
                 }
 
-                auto car = project(Vec3( (game.x)/ 640.0f, 0.0f, 0.5f), camera);
-                rect = { car.x - 40, car.y - 20, 80, 40};
-
-                SDL_FillRect(video, &rect, SDL_MapRGB(video->format, 255, 0, 0));
-
+                auto carProjection = project(Vec3( (game.x)/ 640.0f, 0.0f, 0.5f), camera);
+                rect = { carProjection.x - 50, carProjection.y - 26, 100, 53};
+                int carSprite = std::max( std::min( static_cast<int>( (carProjection.x - 160 ) / 160.0f), 2), 0 );
+                SDL_BlitSurface(car[ carSprite ], nullptr, video, &rect );
                 SDL_Flip(video);
         }
     }
@@ -221,5 +235,19 @@ namespace odb {
             SDL_FillRect(video, &rect, SDL_MapRGB(video->format, shade, shade,  shade ));
 
         }
+    }
+
+    void CRenderer::drawBackdropForHeading(int modulus, int zone ) {
+
+        SDL_Rect rectSrc;
+        SDL_Rect rectDst;
+
+        rectDst = { modulus, 0, 640 - modulus, 480 };
+        SDL_BlitSurface(backdrop[ zone ], nullptr, video, &rectDst );
+
+        rectDst = { 0, 0, modulus, 480 };
+        rectSrc = { 640 - modulus, 0, modulus, 480 };
+        SDL_BlitSurface(backdrop[ zone ], &rectSrc, video, &rectDst );
+
     }
 }

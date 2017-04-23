@@ -23,23 +23,47 @@ namespace odb {
         //1h = 60 minutes * 60 seconds * 1000 ms
         float secondsSinceLastTick = ms / 1000.0f;
         float distanceSinceLastTick = carSpeed * secondsSinceLastTick;
+        timeLeft -= ms;
         distanceRan += distanceSinceLastTick;
         distanceToNextElement -= distanceSinceLastTick;
 
+        if ( timeLeft <= 0 ) {
+            std::cout << "TIME UP!" << std::endl;
+            exit(0);
+        }
+
         if (distanceToNextElement <= 0 ) {
             distanceToNextElement = kSegmentLengthInMeters;
-            elementIndex = ( elementIndex + 1) % track.size(); //len track
+            elementIndex++;
+        }
+
+        if ( elementIndex >= track.size() ) {
+            elementIndex = 0;
+            ++zone;
+            timeLeft += track.size() * 20 * 1000;
+            std::cout << "time:" << (timeLeft / 1000 ) << std::endl;
         }
 
         x += xSpeed * carSpeed * 0.2f;
 
         if ( distanceToNextElement < ( kSegmentLengthInMeters / 2) ) {
-            if ( track[ elementIndex ] == ')') {
+
+            char shape = track[elementIndex];
+            int shapeDelta = 0;
+
+            if (shape == ')') {
+                shapeDelta = -1;
                 x+= 0.15f * carSpeed;
-            } else if ( track[ elementIndex ] == '(') {
+            }
+
+            if (shape == '(') {
+                shapeDelta = 1;
                 x-= 0.15f * carSpeed;
             }
+
+            mHeading -= (shapeDelta / 1000.0f) + ( x / (640.0f * 10000.0f) );
         }
+
 
         if ( x < -160 || x > 160 ) {
 
