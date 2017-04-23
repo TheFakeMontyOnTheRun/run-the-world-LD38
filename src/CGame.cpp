@@ -34,12 +34,23 @@ namespace odb {
         x += xSpeed * carSpeed * 0.2f;
 
         if ( distanceToNextElement < ( kSegmentLengthInMeters / 2) ) {
-            if ( track[ elementIndex ] == ')') {
+
+            char shape = track[elementIndex];
+            int shapeDelta = 0;
+
+            if (shape == ')') {
+                shapeDelta = -1;
                 x+= 0.15f * carSpeed;
-            } else if ( track[ elementIndex ] == '(') {
+            }
+
+            if (shape == '(') {
+                shapeDelta = 1;
                 x-= 0.15f * carSpeed;
             }
+
+            mHeading -= (shapeDelta / 1000.0f) + ( x / (640.0f * 10000.0f) );
         }
+
 
         if ( x < -160 || x > 160 ) {
 

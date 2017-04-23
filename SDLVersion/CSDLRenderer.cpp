@@ -11,11 +11,16 @@
 namespace odb {
 
     SDL_Surface *video;
+    SDL_Surface *backdrop[3];
+
 
     CRenderer::CRenderer(CControlCallback keyPressedCallback, CControlCallback keyReleasedCallback) :
             mOnKeyPressedCallback(keyPressedCallback), mOnKeyReleasedCallback(keyReleasedCallback) {
         SDL_Init(SDL_INIT_EVERYTHING);
         video = SDL_SetVideoMode(640, 480, 0, 0);
+        backdrop[0] = SDL_LoadBMP( "res/1.bmp" );
+        backdrop[1] = SDL_LoadBMP( "res/2.bmp" );
+        backdrop[2] = SDL_LoadBMP( "res/3.bmp" );
     }
 
     void CRenderer::sleep(long ms) {
@@ -144,11 +149,15 @@ namespace odb {
 
                 auto slopeAddedLines = ( 2 * CGame::kSlopeHeightInMeters * (distanceToCurrentShape/static_cast<float>(CGame::kSegmentLengthInMeters)) * slopeDelta  );
 
-                for (int y = 1; y < halfScreenHeight - slopeAddedLines; ++y ) {
-                    int shade = (y / 4);
-                    rect = {0, y, 640, 1};
-                    SDL_FillRect(video, &rect, SDL_MapRGB(video->format, 0, 0, 128 + shade / 2));
+                int modulus = static_cast<int>(game.mHeading * 640) % 640;
+
+                while ( modulus < 0 ) {
+                    modulus += 640;
                 }
+
+
+                drawBackdropForHeading( modulus, game.zone );
+
 
                 for (int y = 0; y < halfScreenHeight + slopeAddedLines + 1; ++y ) {
                     int shade = (y / 4);
@@ -221,5 +230,19 @@ namespace odb {
             SDL_FillRect(video, &rect, SDL_MapRGB(video->format, shade, shade,  shade ));
 
         }
+    }
+
+    void CRenderer::drawBackdropForHeading(int modulus, int zone ) {
+
+        SDL_Rect rectSrc;
+        SDL_Rect rectDst;
+
+        rectDst = { modulus, 0, 640 - modulus, 480 };
+        SDL_BlitSurface(backdrop[ zone ], nullptr, video, &rectDst );
+
+        rectDst = { 0, 0, modulus, 480 };
+        rectSrc = { 640 - modulus, 0, modulus, 480 };
+        SDL_BlitSurface(backdrop[ zone ], &rectSrc, video, &rectDst );
+
     }
 }
