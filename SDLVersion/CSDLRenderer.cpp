@@ -13,6 +13,7 @@ namespace odb {
     SDL_Surface *video;
     SDL_Surface *backdrop[3];
 
+    SDL_Surface *car[3];
 
     CRenderer::CRenderer(CControlCallback keyPressedCallback, CControlCallback keyReleasedCallback) :
             mOnKeyPressedCallback(keyPressedCallback), mOnKeyReleasedCallback(keyReleasedCallback) {
@@ -21,6 +22,11 @@ namespace odb {
         backdrop[0] = SDL_LoadBMP( "res/1.bmp" );
         backdrop[1] = SDL_LoadBMP( "res/2.bmp" );
         backdrop[2] = SDL_LoadBMP( "res/3.bmp" );
+
+        car[0] = SDL_LoadBMP( "res/lancia0.bmp" );
+        car[1] = SDL_LoadBMP( "res/lancia1.bmp" );
+        car[2] = SDL_LoadBMP( "res/lancia2.bmp" );
+
     }
 
     void CRenderer::sleep(long ms) {
@@ -197,11 +203,10 @@ namespace odb {
                     previousRight = rightPoint;
                 }
 
-                auto car = project(Vec3( (game.x)/ 640.0f, 0.0f, 0.5f), camera);
-                rect = { car.x - 40, car.y - 20, 80, 40};
-
-                SDL_FillRect(video, &rect, SDL_MapRGB(video->format, 255, 0, 0));
-
+                auto carProjection = project(Vec3( (game.x)/ 640.0f, 0.0f, 0.5f), camera);
+                rect = { carProjection.x - 50, carProjection.y - 26, 100, 53};
+                int carSprite = std::max( std::min( static_cast<int>( (carProjection.x - 160 ) / 160.0f), 2), 0 );
+                SDL_BlitSurface(car[ carSprite ], nullptr, video, &rect );
                 SDL_Flip(video);
         }
     }
