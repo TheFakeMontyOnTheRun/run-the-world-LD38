@@ -125,13 +125,15 @@ namespace odb {
             case CGame::EGameState::kGameOver:
             case CGame::EGameState::kGame:
 
-                rect = {0, 0, 640, 241};
-                SDL_FillRect(video, &rect, SDL_MapRGB(video->format, 0, 0, 255));
+                rect = {0, 0, 640, 480};
+                SDL_FillRect(video, &rect, SDL_MapRGB(video->format, 0, 0, 0));
 
 
                 int delta = 0;
 
                 char shape = game.track[game.elementIndex];
+                char slope = game.slopes[game.elementIndex];
+
                 if (shape == ')') {
                     delta = -1;
                 }
@@ -139,6 +141,18 @@ namespace odb {
                 if (shape == '(') {
                     delta = 1;
                 }
+
+                float slopeDelta = 0;
+
+                if (slope == '/') {
+                    slopeDelta = 1;
+                }
+
+                if (slope == '\\') {
+                    slopeDelta = -1;
+                }
+
+
 
                 int distance = 0;
 
@@ -150,45 +164,62 @@ namespace odb {
 
 
                 int perspectiveFactor = 0;
+                int subida = 2;
+                int descida = 1;
                 int height = 240;
+                vec2 p0(-1, -1);
+                vec2 p1(-1, -1);
 
-                for (int y = height; y > 0; y--) {
-                    perspectiveFactor = y;
+                int count = 0;
 
-                    int curveFactor = ((height * distance * delta) / y);
-                    int cameraFactor = -((y * game.x) / height);
-                    int roadX = curveFactor + 320 - (perspectiveFactor);
-                    int roadDeltaX = (perspectiveFactor * 2);
+                float initialSlope = distance * slopeDelta;
+                float acc = initialSlope;
+                float deltaAcc =  (-initialSlope) / 480.0f;
+
+                auto addedLines = ( distance / 50.0f * 80 * slopeDelta  );
+
+                for (int y = 1; y < 240 - addedLines; ++y ) {
                     int shade = (y / 4);
 
                     rect = {0, y, 640, 1};
                     SDL_FillRect(video, &rect, SDL_MapRGB(video->format, 0, 0, 128 + shade / 2));
+                }
 
-                    rect = {0, height + y, 640, 1};
+                for (int y = 1; y < 240 + addedLines; ++y ) {
+                    int shade = (y / 4);
+
+                    rect = {0, ( 240 - addedLines ) + y, 640, 1};
                     SDL_FillRect(video, &rect, SDL_MapRGB(video->format, 0, 128 + shade / 2, 0));
-
-                    rect = {roadX, height + y, roadDeltaX, 1};
-                    SDL_FillRect(video, &rect, SDL_MapRGB(video->format, 64 + shade, 64 + shade, 64 + shade));
-
-                    float curve = (distance / 20.0f) * delta * y * y / 50.0f;
-
-                    auto v0 = project(vec3(-0.4 + curve, 0.5f, -y));
-                    rect = {(int) v0.x, (int) v0.y, 3, 3};
-                    SDL_FillRect(video, &rect, SDL_MapRGB(video->format, 255, 255, 255));
-
-
-                    auto v1 = project(vec3(0.4 + curve, 0.5f, -y));
-                    rect = {(int) v1.x, (int) v1.y, 5, 5};
-                    SDL_FillRect(video, &rect, SDL_MapRGB(video->format, 255, 255, 0));
-
-                    auto v2 = project(vec3(curve, -0.5f, -y));
-                    rect = {(int) v2.x, (int) v2.y, 5, 5};
-                    SDL_FillRect(video, &rect, SDL_MapRGB(video->format, 255, 0, 0));
-
                 }
 
 
+                for (float y = height; y > 0; y -= (0.5f )) {
+                    count = ( count + 1) % 1024;
 
+                    std::cout << game.distanceRan << std::endl;
+
+                    acc += deltaAcc;
+
+
+//                    rect = {roadX, height + y, roadDeltaX, 1};
+//                    SDL_FillRect(video, &rect, SDL_MapRGB(video->format, 64 + shade, 64 + shade, 64 + shade));
+
+                    float curve = (distance / 20.0f) * delta * y * y / 50.0f;
+
+
+                    auto v0 = project(vec3(-0.4 + curve, -0.5f + acc, -y + 0.5f));
+                    auto v1 = project(vec3(0.4 + curve, -0.5f + acc, -y + 0.5f));
+
+                    if ( p0.y < 0 ) {
+                        p0 = v0;
+                        p1 = v1;
+                    }
+
+                    fill( v0.x, v1.x, v0.y, p0.x, p1.x, p0.y, (- count + ( game.distanceRan / 1000 ) ) % 4 );
+
+                    p0 = v0;
+                    p1 = v1;
+                }
 
                 rect = SDL_Rect{0, 0, 80, 40};
                 rect.x = 320 + (game.x);
