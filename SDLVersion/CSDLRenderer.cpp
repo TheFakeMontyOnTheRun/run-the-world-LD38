@@ -199,4 +199,30 @@ namespace odb {
                 SDL_Flip(video);
         }
     }
+
+    void CRenderer::fill(float x0, float x1, float y0, float x2, float x3, float y1, int count) {
+        float fromY = std::min( y0, y1 );
+        float toY = std::max( y0, y1 );
+        SDL_Rect rect;
+        float deltaY = toY - fromY;
+
+        float ratiox0x2 = 1.0f;
+        float ratiox1x3 = 1.0f;
+
+        if ( toY - fromY > 0.0f  ) {
+            ratiox0x2 = ( x0 - x2 ) / deltaY;
+            ratiox1x3 = ( x1 - x3 ) / deltaY;
+        }
+
+        float x = x0;
+        float fx = x1;
+        for ( int line = toY; line >= fromY; line--) {
+            rect = { x, line, ( fx - x), 1};
+            x -= ratiox0x2;
+            fx -= ratiox1x3;
+            int shade = 255 * ( count + 10 ) / 20.0f;
+            SDL_FillRect(video, &rect, SDL_MapRGB(video->format, shade, shade,  shade ));
+
+        }
+    }
 }
