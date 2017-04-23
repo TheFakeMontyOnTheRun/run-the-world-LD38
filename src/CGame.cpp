@@ -74,14 +74,17 @@ namespace odb {
 
                     if (command == ECommand::kUp) {
                         std::cout << "up released" << std::endl;
+                        carSpeed = std::min( carSpeed + 1, 20);
                     }
 
                     if (command == ECommand::kDown) {
                         std::cout << "down released" << std::endl;
+                        carSpeed = std::max( carSpeed - 1, 0);
                     }
 
                     if (command == ECommand::kFire1) {
                         std::cout << "fire1 released" << std::endl;
+                        carSpeed = 0;
                     }
                     return;
 
