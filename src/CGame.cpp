@@ -18,22 +18,27 @@ namespace odb {
 
     void CGame::tick(long ms) {
         timeEllapsed += ms;
-        distanceRan += carSpeed * ms;
-        distanceToNextElement -= carSpeed * ms/1000.0f;
+
+        //20 km/h
+        //1h = 60 minutes * 60 seconds * 1000 ms
+        float secondsSinceLastTick = ms / 1000.0f;
+        float distanceSinceLastTick = carSpeed * secondsSinceLastTick;
+        distanceRan += distanceSinceLastTick;
+        distanceToNextElement -= distanceSinceLastTick;
 
         if (distanceToNextElement <= 0 ) {
-            distanceToNextElement = 100;
+            distanceToNextElement = kSegmentLengthInMeters;
             elementIndex = ( elementIndex + 1) % track.size(); //len track
-            std::cout << "entering " << track[ elementIndex ] << " with slope " << slopes[ elementIndex ] << std::endl;
         }
 
-        std::cout << "speed: " << carSpeed << std::endl;
-        x += xSpeed * carSpeed * 0.5f;
+        x += xSpeed * carSpeed * 0.2f;
 
-        if ( track[ elementIndex ] == ')') {
-            x+= 0.35f * carSpeed;
-        } else if ( track[ elementIndex ] == '(') {
-            x-= 0.35f * carSpeed;
+        if ( distanceToNextElement < ( kSegmentLengthInMeters / 2) ) {
+            if ( track[ elementIndex ] == ')') {
+                x+= 0.15f * carSpeed;
+            } else if ( track[ elementIndex ] == '(') {
+                x-= 0.15f * carSpeed;
+            }
         }
 
         if ( x < -160 || x > 160 ) {
@@ -84,12 +89,12 @@ namespace odb {
 
                     if (command == ECommand::kUp) {
                         std::cout << "up released" << std::endl;
-                        carSpeed = std::min( carSpeed + 1, 20);
+                        carSpeed = std::min( carSpeed + 5, 50);
                     }
 
                     if (command == ECommand::kDown) {
                         std::cout << "down released" << std::endl;
-                        carSpeed = std::max( carSpeed - 1, 0);
+                        carSpeed = std::max( carSpeed - 5, 0);
                     }
 
                     if (command == ECommand::kFire1) {

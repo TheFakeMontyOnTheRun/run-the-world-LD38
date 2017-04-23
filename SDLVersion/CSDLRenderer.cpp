@@ -89,9 +89,9 @@ namespace odb {
         }
     }
 
-    Vec2 project(Vec3 v, Vec2 camera) {
-        float xz = (v.x - camera.x) / (1.0f - v.z);
-        float yz = (v.y - camera.y) / (1.0f - v.z);
+    Vec2 project(Vec3 v, Vec3 camera) {
+        float xz = (v.x - camera.x) / (1.0f - v.z + camera.z);
+        float yz = (v.y - camera.y) / (1.0f - v.z + camera.z);
 
         Vec2 v2(320 + (xz * 640), 240 - (yz * 480));
         return v2;
@@ -112,7 +112,7 @@ namespace odb {
                 float roadWidth = 1.0f;
                 char shape = game.track[game.elementIndex];
                 char slope = game.slopes[game.elementIndex];
-                auto camera = Vec2( 0.5f * (game.x)/ 640.0f, 0.2f );
+                auto camera = Vec3( 0.5f * (game.x)/ 640.0f, 0.2f, 0.1f * ( game.carSpeed / 50.0f ) );
 
                 if (shape == ')') {
                     shapeDelta = -1;
@@ -134,15 +134,15 @@ namespace odb {
 
                 int distanceToCurrentShape = 0;
 
-                if (game.distanceToNextElement > 50) {
-                    distanceToCurrentShape = (100 - game.distanceToNextElement);
+                if (game.distanceToNextElement > (CGame::kSegmentLengthInMeters/2)) {
+                    distanceToCurrentShape = (CGame::kSegmentLengthInMeters - game.distanceToNextElement);
                 } else {
                     distanceToCurrentShape = (game.distanceToNextElement);
                 }
 
                 int halfScreenHeight = 480 / 2;
 
-                auto slopeAddedLines = ( 2 * distanceToCurrentShape * slopeDelta  );
+                auto slopeAddedLines = ( 2 * CGame::kSlopeHeightInMeters * (distanceToCurrentShape/static_cast<float>(CGame::kSegmentLengthInMeters)) * slopeDelta  );
 
                 for (int y = 1; y < halfScreenHeight - slopeAddedLines; ++y ) {
                     int shade = (y / 4);
@@ -161,18 +161,19 @@ namespace odb {
 
                 int shadingStripesCount = 0;
 
-                float initialSlope = distanceToCurrentShape * slopeDelta;
+                float initialSlope = CGame::kSlopeHeightInMeters * (distanceToCurrentShape/ static_cast<float>(CGame::kSegmentLengthInMeters)) * slopeDelta;
                 float currentStripeHeight = initialSlope;
                 float stripeHeightDelta =  (-initialSlope) / 480.0f;
 
-                for (float y = halfScreenHeight; y > 0; y -= (0.5f )) {
+                for (float y = halfScreenHeight; y > -1; y -= (0.5f )) {
                     shadingStripesCount = ( shadingStripesCount + 1) % 1024;
 
                     currentStripeHeight += stripeHeightDelta;
 
-                    float curve = (distanceToCurrentShape / 20.0f) * shapeDelta * y * y / 50.0f;
-                    auto leftPoint = project(Vec3(-( roadWidth / 2.0f ) + curve, -0.5f + currentStripeHeight, -y + 0.5f), camera);
-                    auto rightPoint = project(Vec3( (roadWidth / 2.0f ) + curve, -0.5f + currentStripeHeight, -y + 0.5f), camera);
+                    float completelyArbitraryCurveEasingFactor = 100.0f;
+                    float curve = (distanceToCurrentShape / static_cast<float>(CGame::kSegmentLengthInMeters)) * shapeDelta * y * y / completelyArbitraryCurveEasingFactor;
+                    auto leftPoint = project(Vec3(-( roadWidth / 2.0f ) + curve, -0.5f + currentStripeHeight, -y), camera);
+                    auto rightPoint = project(Vec3( (roadWidth / 2.0f ) + curve, -0.5f + currentStripeHeight, -y), camera);
 
                     //if it's valid
                     if ( previousLeft.y < 0 ) {
@@ -180,7 +181,8 @@ namespace odb {
                         previousRight = rightPoint;
                     }
 
-                    fill( leftPoint.x, rightPoint.x, leftPoint.y, previousLeft.x, previousRight.x, previousLeft.y, (- shadingStripesCount + ( game.distanceRan / 1000 ) ) % numberOfStripeShades );
+                    fill( leftPoint.x, rightPoint.x, leftPoint.y, previousLeft.x, previousRight.x, previousLeft.y, (- shadingStripesCount +
+                            static_cast<long>(game.distanceRan) ) % numberOfStripeShades );
 
                     previousLeft = leftPoint;
                     previousRight = rightPoint;
