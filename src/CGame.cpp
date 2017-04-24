@@ -106,6 +106,7 @@ namespace odb {
 
         if ( x < -320 || x > 320 ) {
             std::cout << "outside " << x << std::endl;
+            carSpeed = std::max( carSpeed - 1, 0);
             smoking = smoking || true;
         }
     }
