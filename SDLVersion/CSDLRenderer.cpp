@@ -16,7 +16,7 @@ namespace odb {
     SDL_Surface *video;
     SDL_Surface *backdrop[3];
 
-    SDL_Surface *car[3];
+    SDL_Surface *car[3][3];
 
     CRenderer::CRenderer(CControlCallback keyPressedCallback, CControlCallback keyReleasedCallback) :
             mOnKeyPressedCallback(keyPressedCallback), mOnKeyReleasedCallback(keyReleasedCallback) {
@@ -26,9 +26,18 @@ namespace odb {
         backdrop[1] = SDL_LoadBMP( "res/2.bmp" );
         backdrop[2] = SDL_LoadBMP( "res/3.bmp" );
 
-        car[0] = SDL_LoadBMP( "res/lancia0.bmp" );
-        car[1] = SDL_LoadBMP( "res/lancia1.bmp" );
-        car[2] = SDL_LoadBMP( "res/lancia2.bmp" );
+        car[0][0] = SDL_LoadBMP( "res/big0.bmp" );
+        car[1][0] = SDL_LoadBMP( "res/big1.bmp" );
+        car[2][0] = SDL_LoadBMP( "res/big2.bmp" );
+
+        car[0][1] = SDL_LoadBMP( "res/med0.bmp" );
+        car[1][1] = SDL_LoadBMP( "res/med1.bmp" );
+        car[2][1] = SDL_LoadBMP( "res/med2.bmp" );
+
+        car[0][2] = SDL_LoadBMP( "res/small0.bmp" );
+        car[1][2] = SDL_LoadBMP( "res/small1.bmp" );
+        car[2][2] = SDL_LoadBMP( "res/small2.bmp" );
+
 
     }
 
@@ -206,10 +215,44 @@ namespace odb {
                     previousRight = rightPoint;
                 }
 
-                auto carProjection = project(Vec3( (game.x)/ 640.0f, 0.0f, 0.5f), camera);
+                initialSlope = CGame::kSlopeHeightInMeters * (distanceToCurrentShape/ static_cast<float>(CGame::kSegmentLengthInMeters)) * slopeDelta;
+                stripeHeightDelta =  (-initialSlope) / 480.0f;
+
+                auto cars = game.getCarsAhead(1024);
+                auto playerLane = (game.x - 320)/320.0f;
+
+                for ( auto foe : cars ) {
+                    auto y = std::get<0>(foe) - game.distanceRan;
+                    float curve = (distanceToCurrentShape / static_cast<float>(CGame::kSegmentLengthInMeters)) * shapeDelta * y * y / completelyArbitraryCurveEasingFactor;
+                    currentStripeHeight = initialSlope + ( (2.0f * (halfScreenHeight - y)) * stripeHeightDelta );
+                    auto lane = std::get<1>(foe);
+                    auto carProjection0 = project( Vec3( curve + lane + 0.0f, -1.0f + currentStripeHeight, -y), camera);
+                    auto carProjection1 = project( Vec3( curve + lane + 1.0f, -1.0f + currentStripeHeight, -y), camera);
+                    auto size = carProjection1.x - carProjection0.x;
+                    int carSprite = std::max( std::min( static_cast<int>( lane - playerLane + 1), 2), 0 );
+                    int carSize = 0;
+
+                    if ( size >= 75 ) {
+                        carSize = 0;
+                        size = 100;
+                    } else if ( 40 <= size && size <= 75 ) {
+                        carSize = 1;
+                        size = 50;
+                    } else {
+                        carSize = 2;
+                        size = 25;
+                    }
+
+                    rect = { carProjection0.x, carProjection0.y - (size / 2), size, size / 2};
+                    SDL_BlitSurface(car[ carSprite ][carSize], nullptr, video, &rect );
+                }
+
+                currentStripeHeight = initialSlope + ( (2.0f * (halfScreenHeight)) * stripeHeightDelta );
+                auto carProjection = project(Vec3( (game.x)/ 640.0f, -1.0f + currentStripeHeight, -3.0f), camera);
                 rect = { carProjection.x - 50, carProjection.y - 26, 100, 53};
                 int carSprite = std::max( std::min( static_cast<int>( (carProjection.x - 160 ) / 160.0f), 2), 0 );
-                SDL_BlitSurface(car[ carSprite ], nullptr, video, &rect );
+                SDL_BlitSurface(car[ carSprite ][0], nullptr, video, &rect );
+
                 SDL_Flip(video);
         }
     }
