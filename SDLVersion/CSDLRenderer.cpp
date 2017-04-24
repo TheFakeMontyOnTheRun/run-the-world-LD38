@@ -1,4 +1,7 @@
 #include <functional>
+#include <utility>
+#include <tuple>
+#include <vector>
 #include "Common.h"
 
 #include "CGame.h"
@@ -119,6 +122,7 @@ namespace odb {
             case CGame::EGameState::kGameOver:
             case CGame::EGameState::kGame:
                 int numberOfStripeShades = 4;
+                float completelyArbitraryCurveEasingFactor = 100.0f;
                 int shapeDelta = 0;
                 float roadWidth = 1.0f;
                 char shape = game.track[game.elementIndex];
@@ -183,9 +187,8 @@ namespace odb {
                 for (float y = halfScreenHeight; y > -1; y -= (0.5f )) {
                     shadingStripesCount = ( shadingStripesCount + 1) % 1024;
 
-                    currentStripeHeight += stripeHeightDelta;
+                    currentStripeHeight = initialSlope + ( (2.0f * (halfScreenHeight - y)) * stripeHeightDelta );
 
-                    float completelyArbitraryCurveEasingFactor = 100.0f;
                     float curve = (distanceToCurrentShape / static_cast<float>(CGame::kSegmentLengthInMeters)) * shapeDelta * y * y / completelyArbitraryCurveEasingFactor;
                     auto leftPoint = project(Vec3(-( roadWidth / 2.0f ) + curve, -0.5f + currentStripeHeight, -y), camera);
                     auto rightPoint = project(Vec3( (roadWidth / 2.0f ) + curve, -0.5f + currentStripeHeight, -y), camera);
