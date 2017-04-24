@@ -16,7 +16,7 @@ namespace odb {
 
     SDL_Surface *video;
     SDL_Surface *backdrop[3];
-
+    SDL_Surface *smoke;
     SDL_Surface *car[3][3];
 
     CRenderer::CRenderer(CControlCallback keyPressedCallback, CControlCallback keyReleasedCallback) :
@@ -39,7 +39,7 @@ namespace odb {
         car[1][2] = SDL_LoadBMP( "res/small1.bmp" );
         car[2][2] = SDL_LoadBMP( "res/small2.bmp" );
 
-
+        smoke = SDL_LoadBMP( "res/smoke.bmp" );
     }
 
     void CRenderer::sleep(long ms) {
@@ -222,7 +222,7 @@ namespace odb {
                 stripeHeightDelta =  (-initialSlope) / 480.0f;
 
                 auto cars = game.getCarsAhead(1024);
-                auto playerLane = (game.x - 320)/320.0f;
+                auto playerLane = (game.x)/640.0f;
 
                 for ( auto foe : cars ) {
                     auto y = std::get<0>(foe) - game.distanceRan;
@@ -264,6 +264,12 @@ namespace odb {
 
                 int carSprite = std::max( std::min( static_cast<int>( (carProjection.x - 160 ) / 160.0f), 2), 0 );
                 SDL_BlitSurface(car[ carSprite ][0], nullptr, video, &rect );
+
+                if ( game.smoking ) {
+                    rect.y = carProjection.y + 26 - 33;
+                    rect.h = 33;
+                    SDL_BlitSurface(smoke, nullptr, video, &rect );
+                }
 
                 SDL_Flip(video);
         }

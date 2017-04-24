@@ -42,8 +42,9 @@ namespace odb {
         distanceRan += distanceSinceLastTick;
         distanceToNextElement -= distanceSinceLastTick;
 
+        smoking = ( carSpeed > 0 && carSpeed < 20 );
 
-        auto playerLane = x / 320.0f;
+        auto playerLane = x / 640.0f;
 
 
 
@@ -103,8 +104,9 @@ namespace odb {
         }
 
 
-        if ( x < -160 || x > 160 ) {
-
+        if ( x < -320 || x > 320 ) {
+            std::cout << "outside " << x << std::endl;
+            smoking = smoking || true;
         }
     }
 
@@ -113,11 +115,21 @@ namespace odb {
             if (command == ECommand::kLeft) {
                 std::cout << "left pressed" << std::endl;
                 xSpeed = -1;
+
+                char shape = track[elementIndex];
+                if (shape == ')') {
+                    smoking = true;
+                }
             }
 
             if (command == ECommand::kRight) {
                 std::cout << "Right pressed" << std::endl;
                 xSpeed = 1;
+
+                char shape = track[elementIndex];
+                if (shape == '(') {
+                    smoking = true;
+                }
             }
             if (command == ECommand::kUp) {
                 std::cout << "up pressed" << std::endl;
@@ -157,11 +169,13 @@ namespace odb {
                     if (command == ECommand::kDown) {
                         std::cout << "down released" << std::endl;
                         carSpeed = std::max( carSpeed - 5, 0);
+                        smoking = true;
                     }
 
                     if (command == ECommand::kFire1) {
                         std::cout << "fire1 released" << std::endl;
                         carSpeed = 0;
+                        smoking = true;
                     }
                     return;
 

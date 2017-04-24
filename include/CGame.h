@@ -19,7 +19,7 @@ namespace odb {
         static const int kSegmentLengthInMeters = 1000;
         static const int kSlopeHeightInMeters = 100;
         static const int kZones = 3;
-
+        bool smoking = false;
         float x = 0;
         float xSpeed = 0;
         float mHeading = 0;
