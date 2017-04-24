@@ -27,8 +27,8 @@ namespace odb {
         int zone = 0;
         long timeLeft = 60000;
         //20 seconds per segment is quite fair
-        std::array<char, 3>  track =   {'(' , ')', ')'};
-        std::array<char, 3>  slopes = {'/' , '\\', '_' };
+        std::array<char, 3>  track =   {{'(' , ')', ')'}};
+        std::array<char, 3>  slopes = {{'/' , '\\', '_' }};
         std::vector<CCar> mCars;
 
         int distanceToNextElement = kSegmentLengthInMeters;
