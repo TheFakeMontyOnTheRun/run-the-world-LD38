@@ -29,7 +29,7 @@ namespace odb {
         void handleSystemEvents();
         void sleep( long ms );
 
-        void fill(float x0, float x1, float y0, float x2, float x3, float y1, int count);
+        void fill(float x0, float x1, float y0, float x2, float x3, float y1, int color[3]);
 
         void drawBackdropForHeading(int modulus, int zone);
     };

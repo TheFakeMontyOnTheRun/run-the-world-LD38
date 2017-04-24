@@ -1,5 +1,9 @@
 #include <functional>
 #include <memory>
+#include <array>
+#include <utility>
+#include <tuple>
+#include <vector>
 #include <iostream>
 #include "Common.h"
 #include "CGame.h"

@@ -1,5 +1,6 @@
 CXX = em++
-CXXFLAGS = -g  --preload-file res --use-preload-plugins -Iinclude -std=c++1y
+CXXFLAGS = -g  --preload-file res --use-preload-plugins -Iinclude -std=c++1y -s ALLOW_MEMORY_GROWTH=1 
+LDFLAGS = -s USE_ZLIB=1 -s USE_LIBPNG=1 -s --preload-file res --use-preload-plugins
 
 OBJS = src/CGame.o SDLVersion/CSDLRenderer.o SDLVersion/main.o
 
