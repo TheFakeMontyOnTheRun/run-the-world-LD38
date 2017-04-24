@@ -4,6 +4,9 @@
 #include "Common.h"
 
 namespace odb {
+
+    using CCar = std::tuple<float, float, float>;
+
     class CGame {
     public:
 
@@ -24,6 +27,7 @@ namespace odb {
         //20 seconds per segment is quite fair
         std::array<char, 3>  track =   {'(' , ')', ')'};
         std::array<char, 3>  slopes = {'/' , '\\', '_' };
+        std::vector<CCar> mCars;
 
         int distanceToNextElement = kSegmentLengthInMeters;
 
@@ -40,6 +44,8 @@ namespace odb {
         CControlCallback getKeyPressedCallback();
 
         CControlCallback getKeyReleasedCallback();
+
+        std::vector<CCar> getCarsAhead( int range ) const;
     };
 }
 #endif
