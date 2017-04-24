@@ -30,8 +30,7 @@ namespace RunTheWorld {
     }
 
     bool CGameSession::isOver() {
-//        return mLevel->isOver();
-        return false;
+        return mLevel->isOver();
     }
 
     void CGameSession::addToScore( int score ) {

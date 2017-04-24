@@ -70,16 +70,17 @@ namespace RunTheWorld {
                 (oldPosition <= (distanceRan - distanceSinceLastTick) &&
                  (distanceRan - distanceSinceLastTick) <= newPosition)) {
 
-                if (((playerLane - 0.2f) <= (lane - 0.2f) && (lane - 0.2f) <= (playerLane + 0.2f)) ||
-                    ((playerLane - 0.2f) <= (lane + 0.2f) && (lane + 0.2f) <= (playerLane + 0.2f))) {
+                if (((playerLane - 0.1f) <= (lane - 0.1f) && (lane - 0.1f) <= (playerLane + 0.1f)) ||
+                    ((playerLane - 0.1f) <= (lane + 0.1f) && (lane + 0.1f) <= (playerLane + 0.1f))) {
                     carSpeed = 0;
+                    hit = true;
                 }
             }
         }
 
         if ( timeLeft <= 0 ) {
             std::cout << "TIME UP!" << std::endl;
-            exit(0);
+            mIsOver = true;
         }
 
         if (distanceToNextElement <= 0 ) {
@@ -115,11 +116,15 @@ namespace RunTheWorld {
         }
 
 
-        if ( x < -320 || x > 320 ) {
+        if ( x < -640 || x > 640 ) {
             std::cout << "outside " << x << std::endl;
             carSpeed = std::max( carSpeed - 1, 0);
             smoking = smoking || true;
         }
+    }
+
+    bool CLevel::isOver() {
+        return mIsOver;
     }
 
     void CLevel::onKeyUp( Vipper::ECommand command ) {
@@ -135,12 +140,20 @@ namespace RunTheWorld {
         if (command == Vipper::ECommand::kUp) {
             std::cout << "up released" << std::endl;
             carSpeed = std::min( carSpeed + 5, 50);
+            if ( carSpeed < 50 ) {
+                accel = true;
+            }
+
         }
 
         if (command == Vipper::ECommand::kDown) {
             std::cout << "down released" << std::endl;
             carSpeed = std::max( carSpeed - 5, 0);
             smoking = true;
+            if ( carSpeed > 0 ) {
+                brake = true;
+            }
+
         }
 
         if (command == Vipper::ECommand::kFire1) {

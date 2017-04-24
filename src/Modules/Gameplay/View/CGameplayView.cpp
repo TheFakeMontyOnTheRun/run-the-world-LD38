@@ -52,30 +52,29 @@ namespace RunTheWorld {
 	CGameplayView::CGameplayView(std::shared_ptr<CGameSession> session, std::shared_ptr<Vipper::IRenderer> renderer) : IView( renderer ), mGameSession( session ) {
 
 
-        mBackdrop[0] = renderer->loadBitmap( "res/1.bmp" );
-        mBackdrop[1] = renderer->loadBitmap( "res/2.bmp" );
-        mBackdrop[2] = renderer->loadBitmap( "res/3.bmp" );
+        mBackdrop[0] = renderer->loadBitmap( "res/3.png" );
+        mBackdrop[1] = renderer->loadBitmap( "res/2.png" );
+        mBackdrop[2] = renderer->loadBitmap( "res/1.png" );
 
-        mCar[0][0] = renderer->loadBitmap( "res/big0.bmp" );
-        mCar[1][0] = renderer->loadBitmap( "res/big1.bmp" );
-        mCar[2][0] = renderer->loadBitmap( "res/big2.bmp" );
+        mCar[0][0] = renderer->loadBitmap( "res/big0.png" );
+        mCar[1][0] = renderer->loadBitmap( "res/big1.png" );
+        mCar[2][0] = renderer->loadBitmap( "res/big2.png" );
 
-        mCar[0][1] = renderer->loadBitmap( "res/med0.bmp" );
-        mCar[1][1] = renderer->loadBitmap( "res/med1.bmp" );
-        mCar[2][1] = renderer->loadBitmap( "res/med2.bmp" );
+        mCar[0][1] = renderer->loadBitmap( "res/med0.png" );
+        mCar[1][1] = renderer->loadBitmap( "res/med1.png" );
+        mCar[2][1] = renderer->loadBitmap( "res/med2.png" );
 
-        mCar[0][2] = renderer->loadBitmap( "res/small0.bmp" );
-        mCar[1][2] = renderer->loadBitmap( "res/small1.bmp" );
-        mCar[2][2] = renderer->loadBitmap( "res/small2.bmp" );
+        mCar[0][2] = renderer->loadBitmap( "res/small0.png" );
+        mCar[1][2] = renderer->loadBitmap( "res/small1.png" );
+        mCar[2][2] = renderer->loadBitmap( "res/small2.png" );
 
-        mSmoke = renderer->loadBitmap( "res/smoke.bmp" );
+        mSmoke = renderer->loadBitmap( "res/smoke.png" );
 
-		mFallSound = renderer->loadSound( "res/fall.wav" );
-		mCollapseSound = renderer->loadSound( "res/collapse.wav" );
-    	mBustedSound = renderer->loadSound("res/busted.wav");
-    	mPullSound = renderer->loadSound("res/pull.wav");
+		mHitSound = renderer->loadSound( "res/hit.wav" );
+        mBrakeSound = renderer->loadSound( "res/brake.wav" );
+        mAccelerateSound = renderer->loadSound( "res/accel.wav" );
 
-		mUIFont = renderer->loadFont( "res/albaregular.ttf", 15 );
+        mUIFont = renderer->loadFont( "res/albaregular.ttf", 15 );
 	}
 	
     void CGameplayView::drawTextAt( std::pair<int, int> position, std::string text ) {
@@ -143,18 +142,19 @@ namespace RunTheWorld {
 
                 drawBackdropForHeading( modulus, game->zone );
 
-
+                int shadingStripesCount = 0;
                 for (int y = 0; y < halfScreenHeight + slopeAddedLines + 1; ++y ) {
-
                     auto line = ( halfScreenHeight - slopeAddedLines ) + y;
-                    int shade[3] = { 0, (y / 4), 0 };
+
+
+                    int shade[3] = {0, 64, 0};
                     renderer->fill( 0, 640, line, 0, 640, line + 1, shade );
                 }
 
                 Vec2 previousLeft(-1, -1);
                 Vec2 previousRight(-1, -1);
 
-                int shadingStripesCount = 0;
+                shadingStripesCount = 0;
 
                 float initialSlope = CLevel::kSlopeHeightInMeters * (distanceToCurrentShape/ static_cast<float>(CLevel::kSegmentLengthInMeters)) * slopeDelta;
                 float currentStripeHeight = initialSlope;
@@ -218,13 +218,29 @@ namespace RunTheWorld {
                 auto carProjection = project(Vec3( (game->x)/ 640.0f, -1.0f + currentStripeHeight, -3.0f), camera);
                 int carSprite = std::max( std::min( static_cast<int>( (carProjection.x - 160 ) / 160.0f), 2), 0 );
 
-                renderer->drawBitmapAt( carProjection.x - 50, carProjection.y - 26, 100, 53, mCar[ carSprite ][0] );
+                renderer->drawBitmapAt( carProjection.x - 128, carProjection.y - 32, 100, 53, mCar[ carSprite ][0] );
 
                 if ( game->smoking ) {
-                    renderer->drawBitmapAt( carProjection.x - 50, carProjection.y + 26 - 33, 100, 33, mSmoke );
+                    renderer->drawBitmapAt( carProjection.x - 128, carProjection.y, 100, 33, mSmoke );
                 }
 
-	}
+
+
+        if ( game->hit ) {
+            renderer->playSound( mHitSound );
+            game->hit = false;
+        }
+
+        if ( game->brake ) {
+            renderer->playSound( mBrakeSound );
+            game->brake = false;
+        }
+
+        if ( game->accel ) {
+            renderer->playSound( mAccelerateSound );
+            game->accel = false;
+        }
+    }
 
 	void CGameplayView::onClick( std::pair<int, int> position ) {
 	}

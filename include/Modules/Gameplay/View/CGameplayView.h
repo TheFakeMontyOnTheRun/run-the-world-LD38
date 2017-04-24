@@ -28,10 +28,9 @@ namespace RunTheWorld {
       Vipper::IRenderer::BitmapId mSmoke;
       Vipper::IRenderer::BitmapId mCar[3][3];
 
-    Vipper::IRenderer::SoundId mFallSound;
-    Vipper::IRenderer::SoundId mCollapseSound;
-    Vipper::IRenderer::SoundId mBustedSound;
-    Vipper::IRenderer::SoundId mPullSound;
+    Vipper::IRenderer::SoundId mHitSound;
+      Vipper::IRenderer::SoundId mAccelerateSound;
+    Vipper::IRenderer::SoundId mBrakeSound;
     
     Vipper::IRenderer::FontId mUIFont;
 

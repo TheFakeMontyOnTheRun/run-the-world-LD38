@@ -47,6 +47,11 @@ namespace RunTheWorld {
 
         void onKeyUp( Vipper::ECommand keyCode );
         void onKeyDown( Vipper::ECommand keyCode );
+        bool isOver();
+        bool mIsOver = false;
+        bool hit = false;
+        bool accel = false;
+        bool brake = false;
     };
 }
 #endif

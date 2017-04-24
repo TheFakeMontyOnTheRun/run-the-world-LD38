@@ -40,11 +40,25 @@ namespace RunTheWorld {
 
     mView->show();
 
-    mView->drawTextAt( std::pair<int, int>(0,460), "Pull" );
-    std::stringstream ss;
-    ss << "Score: ";
-    ss << mGameSession->getScore();
 
-    mView->drawTextAt( std::pair<int, int>(120,460), ss.str() );
+    {
+      std::string names[3] = { "Rio de Janeiro", "Toronto", "Lisbon"};
+      std::stringstream ss;
+      ss << " Time left: ";
+      ss << static_cast<long>(mGameSession->getLevel()->timeLeft / 1000 );
+      ss << " Zone: ";
+      ss << names[mGameSession->getLevel()->zone];
+
+      mView->drawTextAt(std::pair<int, int>(120, 460), ss.str());
+    }
+
+
+    {
+      std::stringstream ss;
+      ss << " Score: ";
+      ss << static_cast<long>(mGameSession->getLevel()->distanceRan);
+      mView->drawTextAt(std::pair<int, int>(0, 0), ss.str());
+    }
+
   }
 }

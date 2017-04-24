@@ -11,7 +11,7 @@ namespace RunTheWorld {
 		public:
 		CPlayButton( std::shared_ptr<Vipper::IRenderer> renderer, CRect area, std::string label, std::function<void()> onClick );
 		void show() override;
-		void click( std::pair<int,int> position );
+		bool click( std::pair<int,int> position );
 	};
 }
 #endif

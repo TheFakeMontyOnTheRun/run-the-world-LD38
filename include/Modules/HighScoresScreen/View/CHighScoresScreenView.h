@@ -6,6 +6,7 @@ namespace RunTheWorld {
 		
 		Vipper::IRenderer::FontId mTitleTextFont;
 		Vipper::IRenderer::FontId mInstructionsFont;
+		Vipper::IRenderer::BitmapId mBg;
 		public:
 		explicit CHighScoresScreenView(std::shared_ptr<Vipper::IRenderer> renderer);
 		

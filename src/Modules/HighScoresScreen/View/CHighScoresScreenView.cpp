@@ -9,12 +9,14 @@ namespace RunTheWorld {
 	IView( renderer ){
 		mTitleTextFont = renderer->loadFont( "res/albasuper.ttf", 40 );
 		mInstructionsFont = renderer->loadFont( "res/albaregular.ttf", 15 );
+		mBg = renderer->loadBitmap("res/bg.png");
 	}
 	
 	void CHighScoresScreenView::show() {
 		auto renderer = getRenderer();
 		renderer->drawSquare( 0, 0, 640, 480, {0,0,0,255} );
-		renderer->drawTextAt( 30, 50, "Game Over!", {255,0,255,255}, mTitleTextFont );	
+		renderer->drawBitmapAt( 0, 0, 640, 480, mBg );
+		renderer->drawTextAt( 30, 50, "Game Over!", {0,0,0,255}, mTitleTextFont );
 		renderer->drawTextAt( 20, 440, "Click anywhere to go back to title screen", {255,255,255,255}, mInstructionsFont );
 	}
 	

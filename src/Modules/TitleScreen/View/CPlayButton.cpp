@@ -9,12 +9,14 @@ namespace RunTheWorld {
     IView( renderer ), mBounds( area ), mLabel( label ), mOnClick( onClick ), mLabelFont( renderer->loadFont( "res/albaregular.ttf", 15 ) ) {
     }
 
-    void CPlayButton::click( std::pair<int,int> position ) {
+    bool CPlayButton::click( std::pair<int,int> position ) {
         if ( mBounds.isInside( position.first, position.second ) ) {
 			if ( mOnClick != nullptr ) {
                 mOnClick();
-            }	
+            }
+            return true;
         }
+        return false;
     }
 
     void CPlayButton::show() {
