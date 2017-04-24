@@ -42,11 +42,27 @@ namespace odb {
         distanceRan += distanceSinceLastTick;
         distanceToNextElement -= distanceSinceLastTick;
 
+
+        auto playerLane = x / 320.0f;
+
+
+
         for ( auto& car : mCars ) {
-            auto currentPosition = std::get<0>(car);
+            auto oldPosition = std::get<0>(car);
             auto speed = std::get<2>(car);
-            auto newPosition = currentPosition + ( speed * secondsSinceLastTick );
+            auto newPosition = oldPosition + ( speed * secondsSinceLastTick );
             std::get<0>(car) = newPosition;
+            auto lane = std::get<1>(car);
+
+            if ((oldPosition <= distanceRan && distanceRan <= newPosition) ||
+                (oldPosition <= (distanceRan - distanceSinceLastTick) &&
+                 (distanceRan - distanceSinceLastTick) <= newPosition)) {
+
+                if (((playerLane - 0.2f) <= (lane - 0.2f) && (lane - 0.2f) <= (playerLane + 0.2f)) ||
+                    ((playerLane - 0.2f) <= (lane + 0.2f) && (lane + 0.2f) <= (playerLane + 0.2f))) {
+                    carSpeed = 0;
+                }
+            }
         }
 
         if ( timeLeft <= 0 ) {
