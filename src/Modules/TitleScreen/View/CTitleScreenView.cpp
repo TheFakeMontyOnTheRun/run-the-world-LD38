@@ -10,7 +10,7 @@
 namespace RunTheWorld {
 	
 	CTitleScreenView::CTitleScreenView( std::shared_ptr<Vipper::IRenderer> renderer ) : IView( renderer ) {
-		mButton = std::make_shared<CPlayButton>( renderer, CRect( 310, 420, 400, 450 ), "Play", [&](){
+		mButton = std::make_shared<CPlayButton>( renderer, CRect( 420, 370, 500, 410 ), "Play", [&](){
 			std::dynamic_pointer_cast<CTitleScreenPresenter>(getPresenter())->onClickOnPlayButton();
 		} );
 		
@@ -28,7 +28,8 @@ namespace RunTheWorld {
 
 		mButton->show();
 		renderer->drawTextAt( 15, 0, "Run the world!", {0,0,255,255}, mTitleTextFont );
-		renderer->drawTextAt( 20, 350, "A game by Daniel Monteiro for the LD 38", {0,0,128,255}, mCreditsTextFont );
+		renderer->drawTextAt( 20, 350, "A game by Daniel Monteiro", {0,0,128,255}, mCreditsTextFont );
+        renderer->drawTextAt( 20, 390, "and Livia Vallefor the LD 38", {0,0,128,255}, mCreditsTextFont );
 	}
 	
 	void CTitleScreenView::onClick( std::pair<int, int> position ) {
