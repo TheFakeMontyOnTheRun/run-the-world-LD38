@@ -61,7 +61,7 @@ namespace odb {
                 x-= 0.15f * carSpeed;
             }
 
-            mHeading -= (shapeDelta / 1000.0f) + ( x / (640.0f * 10000.0f) );
+            mHeading -= carSpeed * (shapeDelta / 1000.0f) + ( x / (640.0f * 10000.0f) );
         }
 
 
