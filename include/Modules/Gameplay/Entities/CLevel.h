@@ -3,11 +3,11 @@
 
 #include "Common.h"
 
-namespace odb {
+namespace RunTheWorld {
 
     using CCar = std::tuple<float, float, float>;
 
-    class CGame {
+    class CLevel : public Vipper::IRenderer::IKeyListener {
     public:
 
         enum class EGameState {
@@ -35,7 +35,7 @@ namespace odb {
 
         int elementIndex = 0;
 
-        explicit CGame();
+        explicit CLevel();
 
         long timeEllapsed = 0;
         float distanceRan = 0;
@@ -43,11 +43,10 @@ namespace odb {
 
         void reset();
 
-        CControlCallback getKeyPressedCallback();
-
-        CControlCallback getKeyReleasedCallback();
-
         std::vector<CCar> getCarsAhead( int range ) const;
+
+        void onKeyUp( Vipper::ECommand keyCode );
+        void onKeyDown( Vipper::ECommand keyCode );
     };
 }
 #endif

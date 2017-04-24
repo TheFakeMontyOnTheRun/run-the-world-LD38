@@ -1,6 +1,7 @@
 #ifndef IRENDERER_H
 #define IRENDERER_H
-namespace odb {
+
+namespace RunTheWorld {
 
     struct Vec3 {
         Vec3(float aX, float aY, float aZ) : x(aX), y(aY), z(aZ) {

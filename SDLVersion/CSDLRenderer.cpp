@@ -1,281 +1,39 @@
-#include <functional>
-#include <utility>
 #include <array>
-#include <tuple>
-#include <vector>
-#include "Common.h"
-
-#include "CGame.h"
-#include "CRenderer.h"
-#include <SDL/SDL.h>
-#include <SDL/SDL_mixer.h>
-
+#include <string>
 #include <iostream>
+#include <vector>
+#include <memory>
+#include <map>
+#include <SDL/SDL.h>
+#include <SDL/SDL_image.h>
+#include <SDL/SDL_mixer.h>
+#include <SDL/SDL_ttf.h>
+#include "Vipper/Vipper.h"
+#include "CSDLRenderer.h"
 
-namespace odb {
 
-    SDL_Surface *video;
-    SDL_Surface *backdrop[3];
-    SDL_Surface *smoke;
-    SDL_Surface *car[3][3];
+namespace RunTheWorld {
+        
+    Vipper::IRenderer::BitmapId CSDLRenderer::loadBitmap( std::string path ) {
+      auto id = mSprites.size() + 1;
+      mSprites[ id ] = IMG_Load( path.c_str() );
+      return id;
+    }
+    
+    Vipper::IRenderer::SoundId CSDLRenderer::loadSound( std::string path ) {
+      auto id = mSounds.size() + 1;
+      mSounds[ id ] = Mix_LoadWAV(path.c_str() );
+      return id;
+    }
+    
+    Vipper::IRenderer::FontId CSDLRenderer::loadFont( std::string path, int sizeInPt ) {
+      auto id = mFonts.size() + 1;
+      mFonts[ id ] = TTF_OpenFont(path.c_str(), sizeInPt );
 
-    CRenderer::CRenderer(CControlCallback keyPressedCallback, CControlCallback keyReleasedCallback) :
-            mOnKeyPressedCallback(keyPressedCallback), mOnKeyReleasedCallback(keyReleasedCallback) {
-        SDL_Init(SDL_INIT_EVERYTHING);
-        video = SDL_SetVideoMode(640, 480, 0, 0);
-        backdrop[0] = SDL_LoadBMP( "res/1.bmp" );
-        backdrop[1] = SDL_LoadBMP( "res/2.bmp" );
-        backdrop[2] = SDL_LoadBMP( "res/3.bmp" );
-
-        car[0][0] = SDL_LoadBMP( "res/big0.bmp" );
-        car[1][0] = SDL_LoadBMP( "res/big1.bmp" );
-        car[2][0] = SDL_LoadBMP( "res/big2.bmp" );
-
-        car[0][1] = SDL_LoadBMP( "res/med0.bmp" );
-        car[1][1] = SDL_LoadBMP( "res/med1.bmp" );
-        car[2][1] = SDL_LoadBMP( "res/med2.bmp" );
-
-        car[0][2] = SDL_LoadBMP( "res/small0.bmp" );
-        car[1][2] = SDL_LoadBMP( "res/small1.bmp" );
-        car[2][2] = SDL_LoadBMP( "res/small2.bmp" );
-
-        smoke = SDL_LoadBMP( "res/smoke.bmp" );
+      return id;
     }
 
-    void CRenderer::sleep(long ms) {
-        SDL_Delay(33);
-    }
-
-    void CRenderer::handleSystemEvents() {
-        SDL_Event event;
-
-        while (SDL_PollEvent(&event)) {
-
-            if (event.type == SDL_QUIT) {
-#ifndef __EMSCRIPTEN__
-                exit(0);
-#endif
-            }
-
-            if (event.type == SDL_KEYUP) {
-                switch (event.key.keysym.sym) {
-                    case SDLK_q:
-#ifndef __EMSCRIPTEN__
-                        exit(0);
-#endif
-                    case SDLK_LEFT:
-                        mOnKeyReleasedCallback(ECommand::kLeft);
-                        break;
-
-                    case SDLK_RIGHT:
-                        mOnKeyReleasedCallback(ECommand::kRight);
-                        break;
-
-                    case SDLK_UP:
-                        mOnKeyReleasedCallback(ECommand::kUp);
-                        break;
-
-                    case SDLK_DOWN:
-                        mOnKeyReleasedCallback(ECommand::kDown);
-                        break;
-                    case SDLK_SPACE:
-                        mOnKeyReleasedCallback(ECommand::kFire1);
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-            if (event.type == SDL_KEYDOWN) {
-                switch (event.key.keysym.sym) {
-                    case SDLK_LEFT:
-                        mOnKeyPressedCallback(ECommand::kLeft);
-                        break;
-                    case SDLK_RIGHT:
-                        mOnKeyPressedCallback(ECommand::kRight);
-                        break;
-
-                    case SDLK_UP:
-                        mOnKeyPressedCallback(ECommand::kUp);
-                        break;
-
-                    case SDLK_DOWN:
-                        mOnKeyPressedCallback(ECommand::kDown);
-                        break;
-                    case SDLK_SPACE:
-                        mOnKeyPressedCallback(ECommand::kFire1);
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-        }
-    }
-
-    Vec2 project(Vec3 v, Vec3 camera) {
-        float xz = (v.x - camera.x) / (1.0f - v.z + camera.z);
-        float yz = (v.y - camera.y) / (1.0f - v.z + camera.z);
-
-        Vec2 v2(320 + (xz * 640), 240 - (yz * 480));
-        return v2;
-    }
-
-
-    void CRenderer::render(const CGame &game, long ms) {
-
-        SDL_Rect rect;
-
-        switch (game.gameState) {
-            case CGame::EGameState::kTitleScreen:
-            case CGame::EGameState::kVictory:
-            case CGame::EGameState::kGameOver:
-            case CGame::EGameState::kGame:
-                int numberOfStripeShades = 4;
-                float completelyArbitraryCurveEasingFactor = 100.0f;
-                int shapeDelta = 0;
-                float roadWidth = 1.0f;
-                char shape = game.track[game.elementIndex];
-                char slope = game.slopes[game.elementIndex];
-                auto camera = Vec3( 0.5f * (game.x)/ 640.0f, 0.2f, 0.1f * ( game.carSpeed / 50.0f ) );
-
-                if (shape == ')') {
-                    shapeDelta = -1;
-                }
-
-                if (shape == '(') {
-                    shapeDelta = 1;
-                }
-
-                float slopeDelta = 0;
-
-                if (slope == '/') {
-                    slopeDelta = 1;
-                }
-
-                if (slope == '\\') {
-                    slopeDelta = -1;
-                }
-
-                int distanceToCurrentShape = 0;
-
-                if (game.distanceToNextElement > (CGame::kSegmentLengthInMeters/2)) {
-                    distanceToCurrentShape = (CGame::kSegmentLengthInMeters - game.distanceToNextElement);
-                } else {
-                    distanceToCurrentShape = (game.distanceToNextElement);
-                }
-
-                int halfScreenHeight = 480 / 2;
-
-                auto slopeAddedLines = ( 2 * CGame::kSlopeHeightInMeters * (distanceToCurrentShape/static_cast<float>(CGame::kSegmentLengthInMeters)) * slopeDelta  );
-
-                int modulus = static_cast<int>(game.mHeading * 640) % 640;
-
-                while ( modulus < 0 ) {
-                    modulus += 640;
-                }
-
-
-                drawBackdropForHeading( modulus, game.zone );
-
-
-                for (int y = 0; y < halfScreenHeight + slopeAddedLines + 1; ++y ) {
-
-                    auto line = ( halfScreenHeight - slopeAddedLines ) + y;
-                    int shade[3] = { 0, (y / 4), 0 };
-                    fill( 0, 640, line, 0, 640, line + 1, shade );
-                }
-
-                Vec2 previousLeft(-1, -1);
-                Vec2 previousRight(-1, -1);
-
-                int shadingStripesCount = 0;
-
-                float initialSlope = CGame::kSlopeHeightInMeters * (distanceToCurrentShape/ static_cast<float>(CGame::kSegmentLengthInMeters)) * slopeDelta;
-                float currentStripeHeight = initialSlope;
-                float stripeHeightDelta =  (-initialSlope) / 480.0f;
-
-                for (float y = halfScreenHeight; y > -1; y -= (0.5f )) {
-                    shadingStripesCount = ( shadingStripesCount + 1) % 1024;
-
-                    currentStripeHeight = initialSlope + ( (2.0f * (halfScreenHeight - y)) * stripeHeightDelta );
-
-                    float curve = (distanceToCurrentShape / static_cast<float>(CGame::kSegmentLengthInMeters)) * shapeDelta * y * y / completelyArbitraryCurveEasingFactor;
-                    auto leftPoint = project(Vec3(-( roadWidth / 2.0f ) + curve, -0.5f + currentStripeHeight, -y), camera);
-                    auto rightPoint = project(Vec3( (roadWidth / 2.0f ) + curve, -0.5f + currentStripeHeight, -y), camera);
-
-                    //if it's valid
-                    if ( previousLeft.y < 0 ) {
-                        previousLeft = leftPoint;
-                        previousRight = rightPoint;
-                    }
-
-                    int count = (- shadingStripesCount + static_cast<long>(game.distanceRan) ) % numberOfStripeShades;
-                    int shade[3] = {255 * ( count + 10 ) / 20, 255 * ( count + 10 ) / 20, 255 * ( count + 10 ) / 20 };
-                    fill( leftPoint.x, rightPoint.x, leftPoint.y, previousLeft.x, previousRight.x, previousLeft.y, shade );
-
-                    previousLeft = leftPoint;
-                    previousRight = rightPoint;
-                }
-
-                initialSlope = CGame::kSlopeHeightInMeters * (distanceToCurrentShape/ static_cast<float>(CGame::kSegmentLengthInMeters)) * slopeDelta;
-                stripeHeightDelta =  (-initialSlope) / 480.0f;
-
-                auto cars = game.getCarsAhead(1024);
-                auto playerLane = (game.x)/640.0f;
-
-                for ( auto foe : cars ) {
-                    auto y = std::get<0>(foe) - game.distanceRan;
-                    float curve = (distanceToCurrentShape / static_cast<float>(CGame::kSegmentLengthInMeters)) * shapeDelta * y * y / completelyArbitraryCurveEasingFactor;
-                    currentStripeHeight = initialSlope + ( (2.0f * (halfScreenHeight - y)) * stripeHeightDelta );
-                    auto lane = std::get<1>(foe);
-                    auto carProjection0 = project( Vec3( curve + lane + 0.0f, -1.0f + currentStripeHeight, -y), camera);
-                    auto carProjection1 = project( Vec3( curve + lane + 1.0f, -1.0f + currentStripeHeight, -y), camera);
-                    auto size = carProjection1.x - carProjection0.x;
-                    int carSprite = std::max( std::min( static_cast<int>( lane - playerLane + 1), 2), 0 );
-                    int carSize = 0;
-
-                    if ( size >= 75 ) {
-                        carSize = 0;
-                        size = 100;
-                    } else if ( 40 <= size && size <= 75 ) {
-                        carSize = 1;
-                        size = 50;
-                    } else {
-                        carSize = 2;
-                        size = 25;
-                    }
-
-                    rect.x = carProjection0.x;
-                    rect.y = carProjection0.y - (size / 2);
-                    rect.w = size;
-                    rect.h = size / 2;
-
-                    SDL_BlitSurface(car[ carSprite ][carSize], nullptr, video, &rect );
-                }
-
-                currentStripeHeight = initialSlope + ( (2.0f * (halfScreenHeight)) * stripeHeightDelta );
-                auto carProjection = project(Vec3( (game.x)/ 640.0f, -1.0f + currentStripeHeight, -3.0f), camera);
-
-                rect.x = carProjection.x - 50;
-                rect.y = carProjection.y - 26;
-                rect.w = 100;
-                rect.h = 53;
-
-                int carSprite = std::max( std::min( static_cast<int>( (carProjection.x - 160 ) / 160.0f), 2), 0 );
-                SDL_BlitSurface(car[ carSprite ][0], nullptr, video, &rect );
-
-                if ( game.smoking ) {
-                    rect.y = carProjection.y + 26 - 33;
-                    rect.h = 33;
-                    SDL_BlitSurface(smoke, nullptr, video, &rect );
-                }
-
-                SDL_Flip(video);
-        }
-    }
-
-    void CRenderer::fill(float x0, float x1, float y0, float x2, float x3, float y1, int shade[3]) {
+    void CSDLRenderer::fill(float x0, float x1, float y0, float x2, float x3, float y1, int shade[3]) {
         float fromY = std::min( y0, y1 );
         float toY = std::max( y0, y1 );
         SDL_Rect rect;
@@ -306,28 +64,144 @@ namespace odb {
         }
     }
 
-    void CRenderer::drawBackdropForHeading(int modulus, int zone ) {
+    void CSDLRenderer::drawSquare( int x, int y, int x2, int y2, std::array<int,4> colour ) {
+      SDL_Rect rect;
+      rect.x = x;
+      rect.y = y;
+      rect.w = ( x2 - x );
+      rect.h = ( y2 - y );
+      int colourMerged = SDL_MapRGBA( video->format, colour[ 0 ], colour[ 1 ], colour[ 2 ], colour[ 3 ] );
+      SDL_FillRect( video, &rect, colourMerged );
+    };
+    
+    void CSDLRenderer::drawTextAt( int x, int y, std::string text, std::array<int, 4> colour, Vipper::IRenderer::FontId id ) {
+      if ( id == 0 ) {
+        return;
+      }
 
-        SDL_Rect rectSrc;
-        SDL_Rect rectDst;
+      SDL_Color color = { (Uint8)colour[ 0 ], (Uint8)colour[ 1 ], (Uint8)colour[ 2 ], (Uint8)colour[ 3 ] };
+      auto font = mFonts[ id ];
+      auto result = TTF_RenderText_Solid( font, text.c_str(), color );
+      SDL_Rect rect;
+      rect.x = x;
+      rect.y = y;
+      rect.w = result->w;
+      rect.h = result->h;
+      SDL_BlitSurface( result, nullptr, video, &rect );
+      SDL_FreeSurface( result );
+    };
 
-        rectDst.x = modulus;
-        rectDst.y = 0;
-        rectDst.w = 640 - modulus;
-        rectDst.h = 480;
+    void CSDLRenderer::drawBitmapAt( int x, int y, int w, int h, const IRenderer::BitmapId id ) {
 
-        SDL_BlitSurface(backdrop[ zone ], nullptr, video, &rectDst );
+      if ( id == 0 ) {
+        return;
+      }
 
-        rectDst.x = 0;
-        rectDst.y = 0;
-        rectDst.w = modulus;
-        rectDst.h = 480;
+      auto bitmap = mSprites[ id ];
+      SDL_Rect rect;
+      rect.x = x;
+      rect.y = y;
+      rect.w = w;
+      rect.h = h;
+      SDL_BlitSurface( bitmap, nullptr, video, &rect );
+    };
 
-        rectSrc.x = 640 - modulus;
-        rectSrc.y = 0;
-        rectSrc.w = modulus;
-        rectSrc.h = 480;
+    void CSDLRenderer::playSound( const IRenderer::SoundId& id ) {
+      if ( id == 0 ) {
+        return;
+      }
 
-        SDL_BlitSurface(backdrop[ zone ], &rectSrc, video, &rectDst );
+      auto sound = mSounds[ id ];
+
+      Mix_PlayChannel( -1, sound, 0 );
+    };    
+  
+  CSDLRenderer::CSDLRenderer() {
+  
+    //REFACTOR!  
+    SDL_Init(  SDL_INIT_EVERYTHING );
+    TTF_Init();
+    video = SDL_SetVideoMode( 640, 480, 32, 0 );
+
+    if ( Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024) == -1 ) {
+      std::cout << "coudlnt init mixer" << std::endl;
     }
+  }
+
+  void CSDLRenderer::shutdown() {
+    SDL_Quit();
+  }
+
+  void CSDLRenderer::update() {
+    SDL_Event event;
+
+
+    if ( SDL_PollEvent( &event ) ) {
+
+      if( event.type == SDL_QUIT ) {
+        exit(0);
+      }
+      
+      if ( event.type == SDL_MOUSEBUTTONDOWN ) {
+        dispatchClickToListeners( std::pair<int, int>( event.button.x, event.button.y ) );
+      }
+
+        if (event.type == SDL_KEYUP) {
+            switch (event.key.keysym.sym) {
+                case SDLK_q:
+#ifndef __EMSCRIPTEN__
+                    exit(0);
+#endif
+                case SDLK_LEFT:
+                    dispatchKeyUpToListeners(Vipper::ECommand::kLeft);
+                    break;
+
+                case SDLK_RIGHT:
+                    dispatchKeyUpToListeners(Vipper::ECommand::kRight);
+                    break;
+
+                case SDLK_UP:
+                    dispatchKeyUpToListeners(Vipper::ECommand::kUp);
+                    break;
+
+                case SDLK_DOWN:
+                    dispatchKeyUpToListeners(Vipper::ECommand::kDown);
+                    break;
+                case SDLK_SPACE:
+                    dispatchKeyUpToListeners(Vipper::ECommand::kFire1);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        if (event.type == SDL_KEYDOWN) {
+            switch (event.key.keysym.sym) {
+                case SDLK_LEFT:
+                    dispatchKeyDownToListeners(Vipper::ECommand::kLeft);
+                    break;
+                case SDLK_RIGHT:
+                    dispatchKeyDownToListeners(Vipper::ECommand::kRight);
+                    break;
+
+                case SDLK_UP:
+                    dispatchKeyDownToListeners(Vipper::ECommand::kUp);
+                    break;
+
+                case SDLK_DOWN:
+                    dispatchKeyDownToListeners(Vipper::ECommand::kDown);
+                    break;
+                case SDLK_SPACE:
+                    dispatchKeyDownToListeners(Vipper::ECommand::kFire1);
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+  }
+
+  void CSDLRenderer::render() {
+    SDL_Flip(video);
+  }
 }

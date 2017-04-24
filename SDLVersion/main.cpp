@@ -1,44 +1,76 @@
+#include <set>
+#include <cstdlib>
+#include <string>
+#include <iostream>
+#include <fstream>
 #include <functional>
-#include <memory>
-#include <array>
 #include <utility>
 #include <tuple>
 #include <vector>
+#include <array>
 #include <iostream>
-#include "Common.h"
-#include "CGame.h"
-#include "CRenderer.h"
+#include <random>
+#include <algorithm>
+#include <map>
+#include <vector>
+#include <memory>
+#include <SDL/SDL.h>
+#include <SDL/SDL_mixer.h>
+#include <SDL/SDL_ttf.h>
+ 
+#include "Vipper/Vipper.h"
+#include "CSDLRenderer.h"
 
-#ifdef __EMSCRIPTEN__
-#include <emscripten.h>
-#include <emscripten/html5.h>
+#include "Modules/Gameplay/Gameplay.h"
+#include "Modules/TitleScreen/TitleScreen.h"
 
-#endif
+int main ( int argc, char **argv ) {
+  std::shared_ptr<Vipper::IRouter> nextRouter;
+  std::shared_ptr<Vipper::IPresenter> presenter;
+  std::shared_ptr<Vipper::IRouter> router;
+  
+  auto renderer = std::make_shared<RunTheWorld::CSDLRenderer>();
+  
+  auto titleScreenRouter = std::make_shared<RunTheWorld::CTitleScreenRouter>(renderer);
+  
+  titleScreenRouter->initWithDefaults();
+  
+  nextRouter = titleScreenRouter;
+  presenter = titleScreenRouter->getPresenter();
 
-std::shared_ptr<odb::CRenderer> renderer;
-odb::CGame game;
-
-long gameTime = 0;
-
-void gameLoopTick() {
-  gameTime += 33;
-  renderer->render( game, gameTime );
-  renderer->handleSystemEvents();
-  game.tick( 33 );
-}
-
-
-int main() {
-    renderer = std::make_shared<odb::CRenderer>( game.getKeyPressedCallback(), game.getKeyReleasedCallback() );
-
-#ifdef __EMSCRIPTEN__
-    //  emscripten_request_fullscreen(0, 1);
-  emscripten_set_main_loop( gameLoopTick, 30, 1 );
-#else
-    while ( true ) {
-        gameLoopTick();
-        renderer->sleep( 33 );
+  std::vector<std::shared_ptr<Vipper::IRouter>> routers;
+  
+  do {  
+    if ( nextRouter != nullptr ) {
+      if ( router != nullptr ) {
+        router->onRelinquishFocus();
+        if ( !router->isFinished() ) {
+          routers.push_back( router );
+        }
+        
+      }      
+      router = nextRouter;
+      router->onFocus();
+      nextRouter = nullptr;
     }
-#endif
-    return 0;
+    
+    presenter = router->getPresenter();
+    presenter->present();
+    
+    renderer->update();
+    renderer->render();
+    SDL_Delay(33);
+    
+    nextRouter = router->route();
+
+    if ( router->isFinished() && nextRouter == nullptr ) {
+      
+      nextRouter = routers.back();
+      routers.pop_back();
+    }
+
+  } while ( nextRouter != router );
+
+  renderer->shutdown();
+  return 0;
 }

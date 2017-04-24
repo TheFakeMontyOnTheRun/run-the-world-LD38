@@ -7,15 +7,26 @@
 #include <random>
 #include <algorithm>
 #include "Common.h"
-#include "CGame.h"
+#include <array>
+#include <string>
+#include <iostream>
+#include <vector>
+#include <memory>
+#include <map>
+#include <SDL/SDL.h>
+#include <SDL/SDL_image.h>
+#include <SDL/SDL_mixer.h>
+#include <SDL/SDL_ttf.h>
+#include "Vipper/Vipper.h"
+#include "Modules/Gameplay/Entities/CLevel.h"
 
-namespace odb {
+namespace RunTheWorld {
 
-    void CGame::reset() {
+    void CLevel::reset() {
         timeEllapsed = 0;
     }
 
-    CGame::CGame() {
+    CLevel::CLevel() {
         gameState = EGameState::kGame;
         reset();
 
@@ -31,7 +42,7 @@ namespace odb {
         }
     }
 
-    void CGame::tick(long ms) {
+    void CLevel::tick(long ms) {
         timeEllapsed += ms;
 
         //20 km/h
@@ -111,93 +122,69 @@ namespace odb {
         }
     }
 
-    CControlCallback CGame::getKeyPressedCallback() {
-        return [&](ECommand command) {
-            if (command == ECommand::kLeft) {
-                std::cout << "left pressed" << std::endl;
-                xSpeed = -1;
+    void CLevel::onKeyUp( Vipper::ECommand command ) {
 
-                char shape = track[elementIndex];
-                if (shape == ')') {
-                    smoking = true;
-                }
-            }
+        if (command == Vipper::ECommand::kLeft) {
+            std::cout << "left released" << std::endl;
+        }
 
-            if (command == ECommand::kRight) {
-                std::cout << "Right pressed" << std::endl;
-                xSpeed = 1;
+        if (command == Vipper::ECommand::kRight) {
+            std::cout << "right released" << std::endl;
+        }
 
-                char shape = track[elementIndex];
-                if (shape == '(') {
-                    smoking = true;
-                }
-            }
-            if (command == ECommand::kUp) {
-                std::cout << "up pressed" << std::endl;
-            }
+        if (command == Vipper::ECommand::kUp) {
+            std::cout << "up released" << std::endl;
+            carSpeed = std::min( carSpeed + 5, 50);
+        }
 
-            if (command == ECommand::kDown) {
-                std::cout << "down pressed" << std::endl;
-            }
+        if (command == Vipper::ECommand::kDown) {
+            std::cout << "down released" << std::endl;
+            carSpeed = std::max( carSpeed - 5, 0);
+            smoking = true;
+        }
 
-            if (command == ECommand::kFire1) {
-                std::cout << "fire1 pressed" << std::endl;
-            }
-        };
+        if (command == Vipper::ECommand::kFire1) {
+            std::cout << "fire1 released" << std::endl;
+            carSpeed = 0;
+            smoking = true;
+        }
+        return;
     }
 
-    CControlCallback CGame::getKeyReleasedCallback() {
-        return [&](ECommand command) {
+    void CLevel::onKeyDown( Vipper::ECommand command ) {
+        if (command == Vipper::ECommand::kLeft) {
+            std::cout << "left pressed" << std::endl;
+            xSpeed = -1;
 
-            xSpeed = 0;
-
-            switch (gameState) {
-                case EGameState::kGame:
-
-                    if (command == ECommand::kLeft) {
-                        std::cout << "left released" << std::endl;
-                    }
-
-                    if (command == ECommand::kRight) {
-                        std::cout << "right released" << std::endl;
-                    }
-
-                    if (command == ECommand::kUp) {
-                        std::cout << "up released" << std::endl;
-                        carSpeed = std::min( carSpeed + 5, 50);
-                    }
-
-                    if (command == ECommand::kDown) {
-                        std::cout << "down released" << std::endl;
-                        carSpeed = std::max( carSpeed - 5, 0);
-                        smoking = true;
-                    }
-
-                    if (command == ECommand::kFire1) {
-                        std::cout << "fire1 released" << std::endl;
-                        carSpeed = 0;
-                        smoking = true;
-                    }
-                    return;
-
-                case EGameState::kGameOver:
-                case EGameState::kVictory:
-                    if (command == ECommand::kFire1) {
-                        std::cout << "fire1 released" << std::endl;
-                        gameState = EGameState::kGame;
-                        reset();
-                    }
-                    return;
-
-                case EGameState::kTitleScreen:
-                    gameState = EGameState::kGame;
-                    reset();
-                    return;
+            char shape = track[elementIndex];
+            if (shape == ')') {
+                smoking = true;
             }
-        };
+        }
+
+        if (command == Vipper::ECommand::kRight) {
+            std::cout << "Right pressed" << std::endl;
+            xSpeed = 1;
+
+            char shape = track[elementIndex];
+            if (shape == '(') {
+                smoking = true;
+            }
+        }
+        if (command == Vipper::ECommand::kUp) {
+            std::cout << "up pressed" << std::endl;
+        }
+
+        if (command == Vipper::ECommand::kDown) {
+            std::cout << "down pressed" << std::endl;
+        }
+
+        if (command == Vipper::ECommand::kFire1) {
+            std::cout << "fire1 pressed" << std::endl;
+        }
     }
 
-    std::vector<CCar> CGame::getCarsAhead(int range) const {
+    std::vector<CCar> CLevel::getCarsAhead(int range) const {
         std::vector<CCar> toReturn;
 
         int min = distanceRan;
