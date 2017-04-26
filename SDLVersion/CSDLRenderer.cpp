@@ -129,7 +129,8 @@ namespace RunTheWorld {
   }
 
   void CSDLRenderer::shutdown() {
-    SDL_Quit();
+      SDL_FreeSurface(video);
+      SDL_Quit();
   }
 
   void CSDLRenderer::update() {
