@@ -1,4 +1,14 @@
+#include <iostream>
+#include <array>
+#include <functional>
+#include <map>
+#include <set>
+#include <string>
+#include <functional>
+#include <algorithm>
 #include "Vipper/Vipper.h"
+#include <Modules/TitleScreen/View/CRect.h>
+
 #include "Modules/HighScoresScreen/HighScores.h"
 
 
@@ -25,11 +35,13 @@ namespace RunTheWorld {
 		void CHighScoresScreenRouter::onFocus(){
 			IRouter::onFocus();
 			getRenderer()->registerClickListener( std::dynamic_pointer_cast<CHighScoresScreenView>(getPresenter()->getView()) );
+			getRenderer()->registerKeyListener( std::dynamic_pointer_cast<CHighScoresScreenView>(getPresenter()->getView()) );
 		}
 		
     	void CHighScoresScreenRouter::onRelinquishFocus(){
 			IRouter::onRelinquishFocus();
 			setNextRoute( nullptr );
 			getRenderer()->unregisterClickListener( std::dynamic_pointer_cast<CHighScoresScreenView>(getPresenter()->getView()) );
+			getRenderer()->unregisterKeyListener( std::dynamic_pointer_cast<CHighScoresScreenView>(getPresenter()->getView()) );
 		}		
 }

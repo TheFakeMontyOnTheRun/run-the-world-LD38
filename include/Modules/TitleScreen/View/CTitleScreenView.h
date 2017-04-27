@@ -2,7 +2,7 @@
 #define BF_CTITLESCREENVIEW
 
 namespace RunTheWorld {
-	class CTitleScreenView : public Vipper::IView, public Vipper::IRenderer::IClickListener {
+	class CTitleScreenView : public Vipper::IView, public Vipper::IRenderer::IClickListener, public Vipper::IRenderer::IKeyListener {
 		std::shared_ptr<CPlayButton> mButton;
 		Vipper::IRenderer::BitmapId mTitle;
 		Vipper::IRenderer::FontId mTitleTextFont;
@@ -14,6 +14,8 @@ namespace RunTheWorld {
 		
 		void show() override;
 		void onClick( std::pair<int, int> position ) override;
+		void onKeyUp( Vipper::ECommand keyCode ) override;
+		void onKeyDown( Vipper::ECommand keyCode ) override;
 	};
 }
 #endif

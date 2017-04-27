@@ -121,7 +121,7 @@ namespace RunTheWorld {
     //REFACTOR!  
     SDL_Init(  SDL_INIT_EVERYTHING );
     TTF_Init();
-    video = SDL_SetVideoMode( 640, 480, 32, 0 );
+    video = SDL_SetVideoMode( 640, 480, 0, 0 );
 
     if ( Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024) == -1 ) {
       std::cout << "coudlnt init mixer" << std::endl;
@@ -137,7 +137,7 @@ namespace RunTheWorld {
     SDL_Event event;
 
 
-    if ( SDL_PollEvent( &event ) ) {
+    while ( SDL_PollEvent( &event ) ) {
 
       if( event.type == SDL_QUIT ) {
         exit(0);

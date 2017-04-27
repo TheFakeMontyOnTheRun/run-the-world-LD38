@@ -56,11 +56,13 @@ namespace RunTheWorld {
 		void CTitleScreenRouter::onFocus(){
 			IRouter::onFocus();
 			getRenderer()->registerClickListener( std::dynamic_pointer_cast<CTitleScreenView>(getPresenter()->getView()) );
+			getRenderer()->registerKeyListener( std::dynamic_pointer_cast<CTitleScreenView>(getPresenter()->getView()) );
 		}
 		
     	void CTitleScreenRouter::onRelinquishFocus(){
 			IRouter::onRelinquishFocus();
 			setNextRoute( nullptr );
 			getRenderer()->unregisterClickListener( std::dynamic_pointer_cast<CTitleScreenView>(getPresenter()->getView()) );
+			getRenderer()->unregisterKeyListener( std::dynamic_pointer_cast<CTitleScreenView>(getPresenter()->getView()) );
 		}		
 }

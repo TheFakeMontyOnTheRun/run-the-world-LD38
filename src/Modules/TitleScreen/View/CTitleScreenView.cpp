@@ -14,11 +14,11 @@ namespace RunTheWorld {
 			std::dynamic_pointer_cast<CTitleScreenPresenter>(getPresenter())->onClickOnPlayButton();
 		} );
 		
-		mTitleTextFont = renderer->loadFont( "res/albasuper.ttf", 50 );
-		mCreditsTextFont = renderer->loadFont( "res/albasuper.ttf", 30 );
+		mTitleTextFont = renderer->loadFont( "./res/albasuper.ttf", 50 );
+		mCreditsTextFont = renderer->loadFont( "./res/albasuper.ttf", 30 );
 
-		mTitle = renderer->loadBitmap( "res/title.png" );
-		mSelectedSound = renderer->loadSound( "res/selected.wav" );
+		mTitle = renderer->loadBitmap( "./res/title.png" );
+		mSelectedSound = renderer->loadSound( "./res/selected.wav" );
 	}
 	
 	void CTitleScreenView::show() {
@@ -29,12 +29,20 @@ namespace RunTheWorld {
 		mButton->show();
 		renderer->drawTextAt( 15, 0, "Run the world!", {0,0,255,255}, mTitleTextFont );
 		renderer->drawTextAt( 20, 350, "A game by Daniel Monteiro", {0,0,128,255}, mCreditsTextFont );
-        renderer->drawTextAt( 20, 390, "and Livia Vallefor the LD 38", {0,0,128,255}, mCreditsTextFont );
+        renderer->drawTextAt( 20, 390, "and Livia Valle for the LD 38", {0,0,128,255}, mCreditsTextFont );
 	}
-	
+
 	void CTitleScreenView::onClick( std::pair<int, int> position ) {
 		if ( mButton->click(position) ) {
 			getRenderer()->playSound(mSelectedSound);
 		}
 	}
+
+    void CTitleScreenView::onKeyUp( Vipper::ECommand keyCode ) {
+        mButton->activate();
+        getRenderer()->playSound(mSelectedSound);
+    }
+
+    void CTitleScreenView::onKeyDown( Vipper::ECommand keyCode ) {
+    }
 }

@@ -139,21 +139,10 @@ namespace RunTheWorld {
 
         if (command == Vipper::ECommand::kUp) {
             std::cout << "up released" << std::endl;
-            carSpeed = std::min( carSpeed + 5, 50);
-            if ( carSpeed < 50 ) {
-                accel = true;
-            }
-
         }
 
         if (command == Vipper::ECommand::kDown) {
             std::cout << "down released" << std::endl;
-            carSpeed = std::max( carSpeed - 5, 0);
-            smoking = true;
-            if ( carSpeed > 0 ) {
-                brake = true;
-            }
-
         }
 
         if (command == Vipper::ECommand::kFire1) {
@@ -186,10 +175,19 @@ namespace RunTheWorld {
         }
         if (command == Vipper::ECommand::kUp) {
             std::cout << "up pressed" << std::endl;
+            carSpeed = std::min( carSpeed + 5, 50);
+            if ( carSpeed < 50 ) {
+                accel = true;
+            }
         }
 
         if (command == Vipper::ECommand::kDown) {
             std::cout << "down pressed" << std::endl;
+            carSpeed = std::max( carSpeed - 5, 0);
+            smoking = true;
+            if ( carSpeed > 0 ) {
+                brake = true;
+            }
         }
 
         if (command == Vipper::ECommand::kFire1) {

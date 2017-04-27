@@ -52,29 +52,29 @@ namespace RunTheWorld {
 	CGameplayView::CGameplayView(std::shared_ptr<CGameSession> session, std::shared_ptr<Vipper::IRenderer> renderer) : IView( renderer ), mGameSession( session ) {
 
 
-        mBackdrop[0] = renderer->loadBitmap( "res/3.png" );
-        mBackdrop[1] = renderer->loadBitmap( "res/2.png" );
-        mBackdrop[2] = renderer->loadBitmap( "res/1.png" );
+        mBackdrop[0] = renderer->loadBitmap( "./res/3.png" );
+        mBackdrop[1] = renderer->loadBitmap( "./res/2.png" );
+        mBackdrop[2] = renderer->loadBitmap( "./res/1.png" );
 
-        mCar[0][0] = renderer->loadBitmap( "res/big0.png" );
-        mCar[1][0] = renderer->loadBitmap( "res/big1.png" );
-        mCar[2][0] = renderer->loadBitmap( "res/big2.png" );
+        mCar[0][0] = renderer->loadBitmap( "./res/big0.png" );
+        mCar[1][0] = renderer->loadBitmap( "./res/big1.png" );
+        mCar[2][0] = renderer->loadBitmap( "./res/big2.png" );
 
-        mCar[0][1] = renderer->loadBitmap( "res/med0.png" );
-        mCar[1][1] = renderer->loadBitmap( "res/med1.png" );
-        mCar[2][1] = renderer->loadBitmap( "res/med2.png" );
+        mCar[0][1] = renderer->loadBitmap( "./res/med0.png" );
+        mCar[1][1] = renderer->loadBitmap( "./res/med1.png" );
+        mCar[2][1] = renderer->loadBitmap( "./res/med2.png" );
 
-        mCar[0][2] = renderer->loadBitmap( "res/small0.png" );
-        mCar[1][2] = renderer->loadBitmap( "res/small1.png" );
-        mCar[2][2] = renderer->loadBitmap( "res/small2.png" );
+        mCar[0][2] = renderer->loadBitmap( "./res/small0.png" );
+        mCar[1][2] = renderer->loadBitmap( "./res/small1.png" );
+        mCar[2][2] = renderer->loadBitmap( "./res/small2.png" );
 
-        mSmoke = renderer->loadBitmap( "res/smoke.png" );
+        mSmoke = renderer->loadBitmap( "./res/smoke.png" );
 
-		mHitSound = renderer->loadSound( "res/hit.wav" );
-        mBrakeSound = renderer->loadSound( "res/brake.wav" );
-        mAccelerateSound = renderer->loadSound( "res/accel.wav" );
+		mHitSound = renderer->loadSound( "./res/hit.wav" );
+        mBrakeSound = renderer->loadSound( "./res/brake.wav" );
+        mAccelerateSound = renderer->loadSound( "./res/accel.wav" );
 
-        mUIFont = renderer->loadFont( "res/albaregular.ttf", 15 );
+        mUIFont = renderer->loadFont( "./res/albaregular.ttf", 15 );
 	}
 	
     void CGameplayView::drawTextAt( std::pair<int, int> position, std::string text ) {
