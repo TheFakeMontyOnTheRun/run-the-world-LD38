@@ -81,7 +81,7 @@ namespace RunTheWorld {
 
       SDL_Color color = { (Uint8)colour[ 0 ], (Uint8)colour[ 1 ], (Uint8)colour[ 2 ], (Uint8)colour[ 3 ] };
       auto font = mFonts[ id ];
-      auto result = TTF_RenderText_Solid( font, text.c_str(), color );
+      auto result = TTF_RenderText_Blended( font, text.c_str(), color );
       SDL_Rect rect;
       rect.x = x;
       rect.y = y;
@@ -121,7 +121,7 @@ namespace RunTheWorld {
     //REFACTOR!  
     SDL_Init(  SDL_INIT_EVERYTHING );
     TTF_Init();
-    video = SDL_SetVideoMode( 640, 480, 0, 0 );
+    video = SDL_SetVideoMode( 640, 480, 32, 0 );
 
     if ( Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024) == -1 ) {
       std::cout << "coudlnt init mixer" << std::endl;
