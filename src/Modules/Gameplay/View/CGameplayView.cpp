@@ -32,7 +32,7 @@ namespace RunTheWorld {
 	CGameplayView::CGameplayView(std::shared_ptr<CGameSession> session, std::shared_ptr<Vipper::IRenderer> renderer) : IView( renderer ), mGameSession( session ) {
 
 
-        mBackdrop[0] = renderer->loadBitmap( "res/1.png" );
+        mBackdrop[0] = renderer->loadBitmap( "res/3.png" );
         mBackdrop[1] = renderer->loadBitmap( "res/2.png" );
         mBackdrop[2] = renderer->loadBitmap( "res/1.png" );
 
