@@ -25,28 +25,8 @@ namespace RunTheWorld {
     }
 
     void CGameplayView::drawBackdropForHeading(int modulus, int zone  ) {
-        getRenderer()->drawBitmapAt( 0, 0, 640, 480, mBackdrop[ zone ] );
-
-//        rectDst.x = modulus;
-//        rectDst.y = 0;
-//        rectDst.w = 640 - modulus;
-//        rectDst.h = 480;
-//
-//        renderer->draw
-//
-//        SDL_BlitSurface(backdrop[ zone ], nullptr, video, &rectDst );
-//
-//        rectDst.x = 0;
-//        rectDst.y = 0;
-//        rectDst.w = modulus;
-//        rectDst.h = 480;
-//
-//        rectSrc.x = 640 - modulus;
-//        rectSrc.y = 0;
-//        rectSrc.w = modulus;
-//        rectSrc.h = 480;
-//
-//        SDL_BlitSurface(backdrop[ zone ], &rectSrc, video, &rectDst );
+        getRenderer()->drawBitmapAt( -640 + modulus, 0, 640, 480, mBackdrop[ zone ] );
+        getRenderer()->drawBitmapAt( modulus, 0, 640, 480, mBackdrop[ zone ] );
     }
 
 	CGameplayView::CGameplayView(std::shared_ptr<CGameSession> session, std::shared_ptr<Vipper::IRenderer> renderer) : IView( renderer ), mGameSession( session ) {
