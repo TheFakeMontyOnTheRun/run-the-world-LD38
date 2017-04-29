@@ -18,17 +18,24 @@
 namespace RunTheWorld {
 	CHighScoresScreenView::CHighScoresScreenView(std::shared_ptr<Vipper::IRenderer> renderer):
 	IView( renderer ){
-		mTitleTextFont = renderer->loadFont( "./res/albasuper.ttf", 40 );
-		mInstructionsFont = renderer->loadFont( "./res/albaregular.ttf", 15 );
-		mBg = renderer->loadBitmap("./res/bg.png");
+		mTitleTextFont = renderer->loadFont( "res/albasuper.ttf", 40 );
+		mInstructionsFont = renderer->loadFont( "res/albaregular.ttf", 15 );
+#ifdef __EMSCRIPTEN__
+		mBg = renderer->loadBitmap("res/emgameover.png");
+#else
+	mBg = renderer->loadBitmap("res/bg.png");
+#endif
 	}
 	
 	void CHighScoresScreenView::show() {
 		auto renderer = getRenderer();
 		renderer->drawSquare( 0, 0, 640, 480, {0,0,0,255} );
 		renderer->drawBitmapAt( 0, 0, 640, 480, mBg );
+#ifdef __EMSCRIPTEN__
+#else
 		renderer->drawTextAt( 30, 50, "Game Over!", {0,0,0,255}, mTitleTextFont );
 		renderer->drawTextAt( 20, 440, "Click anywhere to go back to title screen", {255,255,255,255}, mInstructionsFont );
+#endif
 	}
 	
 	void CHighScoresScreenView::onClick( std::pair<int, int> position ) {
