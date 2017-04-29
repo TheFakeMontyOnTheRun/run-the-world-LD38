@@ -79,6 +79,7 @@ namespace RunTheWorld {
                 if (((playerLane - 0.2f) <= (lane - 0.2f) && (lane - 0.2f) <= (playerLane + 0.2f)) ||
                     ((playerLane - 0.2f) <= (lane + 0.2f) && (lane + 0.2f) <= (playerLane + 0.2f))) {
                     carSpeed = 0.0;
+                    std::get<0>(car) += carSpeed;
                     hit = true;
                 }
             }
