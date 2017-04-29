@@ -227,7 +227,7 @@ namespace RunTheWorld {
                     renderer->drawBitmapAt(centerX - 64, centerY - 32, 128, 32, mCar[carSprite][0]);
 
                     if (game->smoking) {
-                        renderer->drawBitmapAt(centerX - 64, carProjection0.y, 100, 33, mSmoke);
+                        renderer->drawBitmapAt(centerX - 64, centerY, 100, 33, mSmoke);
                     }
                 }
 
