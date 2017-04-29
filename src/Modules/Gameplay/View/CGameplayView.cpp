@@ -249,6 +249,17 @@ namespace RunTheWorld {
     }
 
 	void CGameplayView::onClick( std::pair<int, int> position ) {
+        if ( position.first > 420 ) {
+            this->mGameSession->getLevel()->onKeyDown(Vipper::ECommand::kRight);
+        } else if ( position.first < 210 ) {
+            this->mGameSession->getLevel()->onKeyDown(Vipper::ECommand::kLeft);
+        }
+
+        if ( position.second > 320 ) {
+            this->mGameSession->getLevel()->onKeyDown(Vipper::ECommand::kDown);
+        } else if ( position.second < 160 ) {
+            this->mGameSession->getLevel()->onKeyDown(Vipper::ECommand::kUp);
+        }
 	}
 
 	void CGameplayView::onKeyUp( Vipper::ECommand keyCode ) {
