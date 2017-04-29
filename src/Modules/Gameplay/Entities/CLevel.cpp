@@ -66,13 +66,19 @@ namespace RunTheWorld {
             std::get<0>(car) = newPosition;
             auto lane = std::get<1>(car);
 
-            if ((oldPosition <= distanceRan && distanceRan <= newPosition) ||
-                (oldPosition <= (distanceRan - distanceSinceLastTick) &&
-                 (distanceRan - distanceSinceLastTick) <= newPosition)) {
+            auto pz0 = distanceRan;
+            auto pz1 = distanceRan + 1;
+            auto cz0 = newPosition;
+            auto cz1 = newPosition + 1;
 
-                if (((playerLane - 0.1f) <= (lane - 0.1f) && (lane - 0.1f) <= (playerLane + 0.1f)) ||
-                    ((playerLane - 0.1f) <= (lane + 0.1f) && (lane + 0.1f) <= (playerLane + 0.1f))) {
-                    carSpeed = 0;
+            if ((cz0 <= pz0 && pz0 <= cz1) ||
+                ( pz0 <= cz0 && cz0 <= pz1 )||
+                        (cz0 <= pz1 && pz1 <= cz1) ||
+                        ( pz0 <= cz1 && cz1 <= pz1) ) {
+
+                if (((playerLane - 0.2f) <= (lane - 0.2f) && (lane - 0.2f) <= (playerLane + 0.2f)) ||
+                    ((playerLane - 0.2f) <= (lane + 0.2f) && (lane + 0.2f) <= (playerLane + 0.2f))) {
+                    carSpeed = 0.0;
                     hit = true;
                 }
             }
