@@ -32,29 +32,29 @@ namespace RunTheWorld {
 	CGameplayView::CGameplayView(std::shared_ptr<CGameSession> session, std::shared_ptr<Vipper::IRenderer> renderer) : IView( renderer ), mGameSession( session ) {
 
 
-        mBackdrop[0] = renderer->loadBitmap( "./res/3.png" );
-        mBackdrop[1] = renderer->loadBitmap( "./res/2.png" );
-        mBackdrop[2] = renderer->loadBitmap( "./res/1.png" );
+        mBackdrop[0] = renderer->loadBitmap( "res/1.png" );
+        mBackdrop[1] = renderer->loadBitmap( "res/2.png" );
+        mBackdrop[2] = renderer->loadBitmap( "res/1.png" );
 
-        mCar[0][0] = renderer->loadBitmap( "./res/big0.png" );
-        mCar[1][0] = renderer->loadBitmap( "./res/big1.png" );
-        mCar[2][0] = renderer->loadBitmap( "./res/big2.png" );
+        mCar[0][0] = renderer->loadBitmap( "res/big0.png" );
+        mCar[1][0] = renderer->loadBitmap( "res/big1.png" );
+        mCar[2][0] = renderer->loadBitmap( "res/big2.png" );
 
-        mCar[0][1] = renderer->loadBitmap( "./res/med0.png" );
-        mCar[1][1] = renderer->loadBitmap( "./res/med1.png" );
-        mCar[2][1] = renderer->loadBitmap( "./res/med2.png" );
+        mCar[0][1] = renderer->loadBitmap( "res/med0.png" );
+        mCar[1][1] = renderer->loadBitmap( "res/med1.png" );
+        mCar[2][1] = renderer->loadBitmap( "res/med2.png" );
 
-        mCar[0][2] = renderer->loadBitmap( "./res/small0.png" );
-        mCar[1][2] = renderer->loadBitmap( "./res/small1.png" );
-        mCar[2][2] = renderer->loadBitmap( "./res/small2.png" );
+        mCar[0][2] = renderer->loadBitmap( "res/small0.png" );
+        mCar[1][2] = renderer->loadBitmap( "res/small1.png" );
+        mCar[2][2] = renderer->loadBitmap( "res/small2.png" );
 
-        mSmoke = renderer->loadBitmap( "./res/smoke.png" );
+        mSmoke = renderer->loadBitmap( "res/smoke.png" );
 
-		mHitSound = renderer->loadSound( "./res/hit.wav" );
-        mBrakeSound = renderer->loadSound( "./res/brake.wav" );
-        mAccelerateSound = renderer->loadSound( "./res/accel.wav" );
+		mHitSound = renderer->loadSound( "res/hit.wav" );
+        mBrakeSound = renderer->loadSound( "res/brake.wav" );
+        mAccelerateSound = renderer->loadSound( "res/accel.wav" );
 
-        mUIFont = renderer->loadFont( "./res/albaregular.ttf", 15 );
+        mUIFont = renderer->loadFont( "res/albaregular.ttf", 15 );
 	}
 	
     void CGameplayView::drawTextAt( std::pair<int, int> position, std::string text ) {
@@ -172,38 +172,64 @@ namespace RunTheWorld {
                 for ( auto foe : cars ) {
                     auto y = std::get<0>(foe) - game->distanceRan;
                     float curve = (distanceToCurrentShape / static_cast<float>(CLevel::kSegmentLengthInMeters)) * shapeDelta * y * y / completelyArbitraryCurveEasingFactor;
-                    currentStripeHeight = initialSlope + ( (2.0f * (halfScreenHeight - y)) * stripeHeightDelta );
+
                     auto lane = std::get<1>(foe);
-                    auto carProjection0 = project( Vec3( curve + lane + 0.0f, -1.0f + currentStripeHeight, -y), camera);
-                    auto carProjection1 = project( Vec3( curve + lane + 1.0f, -1.0f + currentStripeHeight, -y), camera);
-                    auto size = carProjection1.x - carProjection0.x;
-                    int carSprite = std::max( std::min( static_cast<int>( lane - playerLane + 1), 2), 0 );
+                    currentStripeHeight = initialSlope + ( (2.0f * (halfScreenHeight - y + 1)) * stripeHeightDelta );
+                    auto carProjection0 = project( Vec3( curve + lane - 0.2f, -1.0f + currentStripeHeight, -y + 0), camera);
+                    auto carProjection1 = project( Vec3( curve + lane + 0.2f, -1.0f + currentStripeHeight, -y + 0), camera);
+                    currentStripeHeight = initialSlope + ( (2.0f * (halfScreenHeight - y - 1)) * stripeHeightDelta );
+                    auto carProjection2 = project( Vec3( curve + lane - 0.2f, -1.0f + currentStripeHeight, -y - 1), camera);
+                    auto carProjection3 = project( Vec3( curve + lane + 0.2f, -1.0f + currentStripeHeight, -y - 1), camera);
+
+                    int carSprite = (lane + 0.5) + 1;
                     int carSize = 0;
 
-                    if ( size >= 75 ) {
+                    int sizeX = 32;
+                    int sizeY = 8;
+
+                    if ( y <= 5 ) {
                         carSize = 0;
-                        size = 100;
-                    } else if ( 40 <= size && size <= 75 ) {
+                        sizeX = 128;
+                        sizeY = 64;
+                    } else if ( 5 <= y && y <= 25 ) {
                         carSize = 1;
-                        size = 50;
-                    } else {
+                        sizeX = 64;
+                        sizeY = 32;
+                    } else if ( 25 <= y && y <= 75 ) {
                         carSize = 2;
-                        size = 25;
+                        sizeX = 32;
+                        sizeY = 16;
+                    } else {
+                        continue;
                     }
 
-                    renderer->drawBitmapAt( carProjection0.x, carProjection0.y - (size / 2), size, size / 2, mCar[ carSprite ][carSize] );
+
+                    int black[3] = {0,0,0};
+                    auto centerX = carProjection0.x + ((carProjection1.x - carProjection0.x) / 2);
+                    auto centerY = carProjection0.y + ((carProjection2.y - carProjection0.y) / 2);
+                    renderer->drawBitmapAt(centerX - (sizeX/2), centerY - (sizeY/2), sizeX, sizeY, mCar[carSprite][carSize]);
                 }
 
-                currentStripeHeight = initialSlope + ( (2.0f * (halfScreenHeight)) * stripeHeightDelta );
-                auto carProjection = project(Vec3( (game->x)/ 640.0f, -1.0f + currentStripeHeight, -3.0f), camera);
-                int carSprite = std::max( std::min( static_cast<int>( (carProjection.x - 160 ) / 160.0f), 2), 0 );
 
-                renderer->drawBitmapAt( carProjection.x - 128, carProjection.y - 32, 100, 53, mCar[ carSprite ][0] );
+                {
+                    auto lane = (game->x) / 640.0f;
+                    currentStripeHeight = initialSlope + ( (2.0f * (halfScreenHeight -4.1)) * stripeHeightDelta );
+                    auto carProjection2 = project(Vec3(lane -0.2f, -1.0f + currentStripeHeight, -2 -1.1), camera);
+                    auto carProjection3 = project(Vec3(lane +0.2f, -1.0f + currentStripeHeight, -2 -1.1), camera);
+                    currentStripeHeight = initialSlope + ( (2.0f * (halfScreenHeight -2.1)) * stripeHeightDelta );
+                    auto carProjection0 = project(Vec3(lane -0.2f, -1.0f + currentStripeHeight, -2 -0.1), camera);
+                    auto carProjection1 = project(Vec3(lane +0.2f, -1.0f + currentStripeHeight, -2 -0.1), camera);
 
-                if ( game->smoking ) {
-                    renderer->drawBitmapAt( carProjection.x - 128, carProjection.y, 100, 33, mSmoke );
+                    int black[3] = {0,0,0};
+                    auto centerX = carProjection0.x + ((carProjection1.x - carProjection0.x) / 2);
+                    auto centerY = carProjection0.y + ((carProjection2.y - carProjection0.y) / 2);
+                    int carSprite = (lane + 0.5) + 1;
+                    renderer->drawBitmapAt(centerX - 64, centerY - 32, 128, 32, mCar[carSprite][0]);
+
+                    if (game->smoking) {
+                        renderer->drawBitmapAt(centerX - 64, carProjection0.y, 100, 33, mSmoke);
+                    }
                 }
-
 
 
         if ( game->hit ) {
