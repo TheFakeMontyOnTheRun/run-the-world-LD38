@@ -101,7 +101,9 @@ namespace RunTheWorld {
             std::cout << "time:" << (timeLeft / 1000 ) << std::endl;
         }
 
-        x += xSpeed * carSpeed * 0.2f;
+        if ( carSpeed > 0 ) {
+            x += xSpeed * (carSpeed + 2) * 0.2f;
+        }
 
         if ( distanceToNextElement < ( kSegmentLengthInMeters / 2) ) {
 
