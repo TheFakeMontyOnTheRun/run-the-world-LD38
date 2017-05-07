@@ -48,6 +48,19 @@ namespace RunTheWorld {
         mCar[1][2] = renderer->loadBitmap( "res/small1.png" );
         mCar[2][2] = renderer->loadBitmap( "res/small2.png" );
 
+        mOtherCar[0][0] = renderer->loadBitmap( "res/obig0.png" );
+        mOtherCar[1][0] = renderer->loadBitmap( "res/obig1.png" );
+        mOtherCar[2][0] = renderer->loadBitmap( "res/obig2.png" );
+
+        mOtherCar[0][1] = renderer->loadBitmap( "res/omed0.png" );
+        mOtherCar[1][1] = renderer->loadBitmap( "res/omed1.png" );
+        mOtherCar[2][1] = renderer->loadBitmap( "res/omed2.png" );
+
+        mOtherCar[0][2] = renderer->loadBitmap( "res/osmall0.png" );
+        mOtherCar[1][2] = renderer->loadBitmap( "res/osmall1.png" );
+        mOtherCar[2][2] = renderer->loadBitmap( "res/osmall2.png" );
+
+
         mSmoke = renderer->loadBitmap( "res/smoke.png" );
 
 		mHitSound = renderer->loadSound( "res/hit.wav" );
@@ -208,7 +221,7 @@ namespace RunTheWorld {
                     auto centerX = carProjection0.x + ((carProjection1.x - carProjection0.x) / 2);
                     auto centerY = carProjection0.y + ((carProjection2.y - carProjection0.y) / 2);
                     renderer->fill( carProjection0.x, carProjection1.x, carProjection0.y, carProjection2.x, carProjection3.x, centerY, black );
-                    renderer->drawBitmapAt(centerX - (sizeX/2), centerY - (sizeY/2), sizeX, sizeY, mCar[carSprite][carSize]);
+                    renderer->drawBitmapAt(centerX - (sizeX/2), centerY - (sizeY/2), sizeX, sizeY, mOtherCar[carSprite][carSize]);
                 }
 
 
