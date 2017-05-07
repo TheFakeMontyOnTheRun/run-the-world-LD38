@@ -27,6 +27,7 @@ namespace RunTheWorld {
       Vipper::IRenderer::BitmapId mBackdrop[3];
       Vipper::IRenderer::BitmapId mSmoke;
       Vipper::IRenderer::BitmapId mCar[3][3];
+      Vipper::IRenderer::BitmapId mOtherCar[3][3];
 
     Vipper::IRenderer::SoundId mHitSound;
       Vipper::IRenderer::SoundId mAccelerateSound;
