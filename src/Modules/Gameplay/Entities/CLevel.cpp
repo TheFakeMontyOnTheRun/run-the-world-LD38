@@ -99,8 +99,8 @@ namespace RunTheWorld {
 
         if ( elementIndex >= track.size() ) {
             elementIndex = 0;
-            ++zone;
             timeLeft += track.size() * 20 * 1000;
+            zone = (zone + 1) % kZones;
             std::cout << "time:" << (timeLeft / 1000 ) << std::endl;
         }
 
