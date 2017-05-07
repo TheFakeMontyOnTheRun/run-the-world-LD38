@@ -207,6 +207,7 @@ namespace RunTheWorld {
                     int black[3] = {0,0,0};
                     auto centerX = carProjection0.x + ((carProjection1.x - carProjection0.x) / 2);
                     auto centerY = carProjection0.y + ((carProjection2.y - carProjection0.y) / 2);
+                    renderer->fill( carProjection0.x, carProjection1.x, carProjection0.y, carProjection2.x, carProjection3.x, centerY, black );
                     renderer->drawBitmapAt(centerX - (sizeX/2), centerY - (sizeY/2), sizeX, sizeY, mCar[carSprite][carSize]);
                 }
 
@@ -224,6 +225,7 @@ namespace RunTheWorld {
                     auto centerX = carProjection0.x + ((carProjection1.x - carProjection0.x) / 2);
                     auto centerY = carProjection0.y + ((carProjection2.y - carProjection0.y) / 2);
                     int carSprite = (lane + 0.5) + 1;
+                    renderer->fill( carProjection0.x, carProjection1.x, carProjection0.y, carProjection2.x, carProjection3.x, centerY, black );
                     renderer->drawBitmapAt(centerX - 64, centerY - 32, 128, 32, mCar[carSprite][0]);
 
                     if (game->smoking) {
