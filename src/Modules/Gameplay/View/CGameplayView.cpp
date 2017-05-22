@@ -31,7 +31,6 @@ namespace RunTheWorld {
 
 	CGameplayView::CGameplayView(std::shared_ptr<CGameSession> session, std::shared_ptr<Vipper::IRenderer> renderer) : IView( renderer ), mGameSession( session ) {
 
-
         mBackdrop[0] = renderer->loadBitmap( "res/3.png" );
         mBackdrop[1] = renderer->loadBitmap( "res/2.png" );
         mBackdrop[2] = renderer->loadBitmap( "res/1.png" );
@@ -138,10 +137,7 @@ namespace RunTheWorld {
                 int shadingStripesCount = 0;
                 for (int y = 0; y < halfScreenHeight + slopeAddedLines + 1; ++y ) {
                     auto line = ( halfScreenHeight - slopeAddedLines ) + y;
-
-
-                    int shade[3] = {0, 64, 0};
-                    renderer->fill( 0, 640, line, 0, 640, line + 1, shade );
+                    renderer->fill( 0, 640, line, 0, 640, line + 1, {0, 0, 64, 0});
                 }
 
                 Vec2 previousLeft(-1, -1);
@@ -169,8 +165,7 @@ namespace RunTheWorld {
                     }
 
                     int count = (- shadingStripesCount + static_cast<long>(game->distanceRan) ) % numberOfStripeShades;
-                    int shade[3] = {255 * ( count + 10 ) / 20, 255 * ( count + 10 ) / 20, 255 * ( count + 10 ) / 20 };
-                    renderer->fill( leftPoint.x, rightPoint.x, leftPoint.y, previousLeft.x, previousRight.x, previousLeft.y, shade );
+                    renderer->fill( leftPoint.x, rightPoint.x, leftPoint.y, previousLeft.x, previousRight.x, previousLeft.y, {0, 255 * ( count + 10 ) / 20, 255 * ( count + 10 ) / 20, 255 * ( count + 10 ) / 20 } );
 
                     previousLeft = leftPoint;
                     previousRight = rightPoint;
@@ -217,10 +212,9 @@ namespace RunTheWorld {
                     }
 
 
-                    int black[3] = {0,0,0};
                     auto centerX = carProjection0.x + ((carProjection1.x - carProjection0.x) / 2);
                     auto centerY = carProjection0.y + ((carProjection2.y - carProjection0.y) / 2);
-                    renderer->fill( carProjection0.x, carProjection1.x, carProjection0.y, carProjection2.x, carProjection3.x, centerY, black );
+                    renderer->fill( carProjection0.x, carProjection1.x, carProjection0.y, carProjection2.x, carProjection3.x, centerY, {0,0,0,0} );
                     renderer->drawBitmapAt(centerX - (sizeX/2), centerY - (sizeY/2), sizeX, sizeY, mOtherCar[carSprite][carSize]);
                 }
 
@@ -238,7 +232,7 @@ namespace RunTheWorld {
                     auto centerX = carProjection0.x + ((carProjection1.x - carProjection0.x) / 2);
                     auto centerY = carProjection0.y + ((carProjection2.y - carProjection0.y) / 2);
                     int carSprite = (lane + 0.5) + 1;
-                    renderer->fill( carProjection0.x, carProjection1.x, carProjection0.y, carProjection2.x, carProjection3.x, centerY, black );
+                    renderer->fill( carProjection0.x, carProjection1.x, carProjection0.y, carProjection2.x, carProjection3.x, centerY, {0,0,0,0} );
                     renderer->drawBitmapAt(centerX - 64, centerY - 32, 128, 32, mCar[carSprite][0]);
 
                     if (game->smoking) {

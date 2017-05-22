@@ -24,7 +24,7 @@ namespace RunTheWorld {
         float xSpeed = 0;
         float mHeading = 0;
         int carSpeed = 0;
-        int zone = 0;
+        int zone = 2;
         long timeLeft = 90000;
         //20 seconds per segment is quite fair
         std::array<char, 3>  track =   {{'(' , ')', ')'}};

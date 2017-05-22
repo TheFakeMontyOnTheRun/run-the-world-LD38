@@ -33,7 +33,7 @@ namespace RunTheWorld {
       return id;
     }
 
-    void CSDLRenderer::fill(float x0, float x1, float y0, float x2, float x3, float y1, int shade[3]) {
+    void CSDLRenderer::fill(float x0, float x1, float y0, float x2, float x3, float y1, std::array<int,4> shade) {
         float fromY = std::min( y0, y1 );
         float toY = std::max( y0, y1 );
         SDL_Rect rect;

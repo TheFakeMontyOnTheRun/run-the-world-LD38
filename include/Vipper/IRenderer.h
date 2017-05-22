@@ -48,7 +48,7 @@ namespace Vipper {
     virtual void playSound( const SoundId& id ) = 0;
     virtual void update() = 0;
     virtual void shutdown() = 0;
-    virtual void fill(float x0, float x1, float y0, float x2, float x3, float y1, int shade[3]) = 0;
+    virtual void fill(float x0, float x1, float y0, float x2, float x3, float y1, std::array<int,4> color) = 0;
     void registerClickListener( std::shared_ptr<IClickListener> listener );
     void unregisterClickListener( std::shared_ptr<IClickListener> listener );
     

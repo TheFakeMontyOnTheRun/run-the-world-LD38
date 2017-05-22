@@ -1,14 +1,14 @@
-#ifndef BF_CSDLRenderer_H
-#define BF_CSDLRenderer_H
+#ifndef BF_CDOSRenderer_H
+#define BF_CDOSRenderer_H
 
 namespace RunTheWorld {
-  class CSDLRenderer : public Vipper::IRenderer {
-    SDL_Surface *video;
-    std::map<IRenderer::BitmapId, SDL_Surface*> mSprites;
-    std::map<IRenderer::SoundId, Mix_Chunk*> mSounds;
-    std::map<IRenderer::FontId, TTF_Font*> mFonts;
+
+  class CDOSRenderer : public Vipper::IRenderer {
+    std::array<unsigned int, 320 * 200 > mBuffer;
+    std::array<char, 80 * 25 > mTextBuffer;
+    std::map<IRenderer::BitmapId, std::shared_ptr<odb::NativeBitmap>> mSprites;
   public:
-    explicit CSDLRenderer();
+    explicit CDOSRenderer();
     void render() override;
     void shutdown() override;
     void update() override;        
@@ -19,7 +19,7 @@ namespace RunTheWorld {
     void drawTextAt( int x, int y, std::string text, std::array<int, 4> colour, FontId font ) override;
     void drawBitmapAt( int x, int y, int w, int h, const BitmapId id ) override;
     void playSound( const SoundId& id ) override;
-      void fill(float x0, float x1, float y0, float x2, float x3, float y1, std::array<int,4> shade) override;
+    void fill(float x0, float x1, float y0, float x2, float x3, float y1, std::array<int,4> shade) override;
   };
 }
 #endif

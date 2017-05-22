@@ -3,20 +3,14 @@
 #include <tuple>
 #include <vector>
 #include <array>
-#include <iostream>
 #include <random>
 #include <algorithm>
 #include "Common.h"
 #include <array>
 #include <string>
-#include <iostream>
 #include <vector>
 #include <memory>
 #include <map>
-#include <SDL/SDL.h>
-#include <SDL/SDL_image.h>
-#include <SDL/SDL_mixer.h>
-#include <SDL/SDL_ttf.h>
 #include "Vipper/Vipper.h"
 #include "Modules/Gameplay/Entities/CLevel.h"
 
@@ -79,7 +73,6 @@ namespace RunTheWorld {
                 if (((playerLane - 0.2f) <= (lane - 0.2f) && (lane - 0.2f) <= (playerLane + 0.2f)) ||
                     ((playerLane - 0.2f) <= (lane + 0.2f) && (lane + 0.2f) <= (playerLane + 0.2f))) {
                     carSpeed = 0.0;
-                    std::cout << "COLLISION!" << std::endl;
                     std::get<0>(car) = distanceRan + std::get<2>(car) / 2 + 10 + carSpeed / 2;
                     std::get<2>(car) += carSpeed / 2;
                     hit = true;
@@ -88,7 +81,6 @@ namespace RunTheWorld {
         }
 
         if ( timeLeft <= 0 ) {
-            std::cout << "TIME UP!" << std::endl;
             mIsOver = true;
         }
 
@@ -101,7 +93,6 @@ namespace RunTheWorld {
             elementIndex = 0;
             zone = (zone + 1) % kZones;
             timeLeft += track.size() * 30 * 1000;
-            std::cout << "time:" << (timeLeft / 1000 ) << std::endl;
         }
 
         if ( carSpeed > 0 ) {
@@ -128,7 +119,6 @@ namespace RunTheWorld {
 
 
         if ( x < -640 || x > 640 ) {
-            std::cout << "outside " << x << std::endl;
             carSpeed = std::max( carSpeed - 1, 0);
             smoking = smoking || true;
         }
@@ -141,23 +131,18 @@ namespace RunTheWorld {
     void CLevel::onKeyUp( Vipper::ECommand command ) {
 
         if (command == Vipper::ECommand::kLeft) {
-            std::cout << "left released" << std::endl;
         }
 
         if (command == Vipper::ECommand::kRight) {
-            std::cout << "right released" << std::endl;
         }
 
         if (command == Vipper::ECommand::kUp) {
-            std::cout << "up released" << std::endl;
         }
 
         if (command == Vipper::ECommand::kDown) {
-            std::cout << "down released" << std::endl;
         }
 
         if (command == Vipper::ECommand::kFire1) {
-            std::cout << "fire1 released" << std::endl;
             carSpeed = 0;
             smoking = true;
         }
@@ -166,7 +151,6 @@ namespace RunTheWorld {
 
     void CLevel::onKeyDown( Vipper::ECommand command ) {
         if (command == Vipper::ECommand::kLeft) {
-            std::cout << "left pressed" << std::endl;
             xSpeed = -1;
 
             char shape = track[elementIndex];
@@ -176,7 +160,6 @@ namespace RunTheWorld {
         }
 
         if (command == Vipper::ECommand::kRight) {
-            std::cout << "Right pressed" << std::endl;
             xSpeed = 1;
 
             char shape = track[elementIndex];
@@ -185,7 +168,6 @@ namespace RunTheWorld {
             }
         }
         if (command == Vipper::ECommand::kUp) {
-            std::cout << "up pressed" << std::endl;
             carSpeed = std::min( carSpeed + 5, 50);
             if ( carSpeed < 50 ) {
                 accel = true;
@@ -193,7 +175,6 @@ namespace RunTheWorld {
         }
 
         if (command == Vipper::ECommand::kDown) {
-            std::cout << "down pressed" << std::endl;
             carSpeed = std::max( carSpeed - 5, 0);
             smoking = true;
             if ( carSpeed > 0 ) {
@@ -202,7 +183,6 @@ namespace RunTheWorld {
         }
 
         if (command == Vipper::ECommand::kFire1) {
-            std::cout << "fire1 pressed" << std::endl;
         }
     }
 
