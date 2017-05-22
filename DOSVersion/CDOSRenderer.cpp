@@ -273,8 +273,8 @@ namespace RunTheWorld {
     int offset = 0;
 
     unsigned char buffer[ 320 * 200 ];
-    int origin = -1;
-    int lastOrigin = 1;
+    int origin = 0;
+    int lastOrigin = -1;
     unsigned char shade;
     
     for (int y = 0; y < 200; ++y) {
