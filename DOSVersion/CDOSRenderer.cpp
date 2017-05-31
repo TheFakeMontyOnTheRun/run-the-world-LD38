@@ -88,7 +88,18 @@ namespace RunTheWorld {
   }
   
     Vipper::IRenderer::BitmapId CDOSRenderer::loadBitmap( std::string path ) {
-      auto id = mSprites.size() + 1;
+      
+
+      auto id = 1;
+
+      for ( const auto& bitmap : mSprites ) {
+	if (bitmap->getId() == path ) {
+	  return id;
+	}
+	++id;
+      }
+      
+      id = mSprites.size() + 1;
       
       std::cout << "loading " << path << std::endl;
 
@@ -101,7 +112,7 @@ namespace RunTheWorld {
       auto rawData = new int[ xSize * ySize ];
       std::memcpy( rawData, image, xSize * ySize * 4 );
       stbi_image_free(image);
-      mSprites[ id ] = std::make_shared<odb::NativeBitmap>( path, xSize, ySize, rawData );
+      mSprites.push_back( std::make_shared<odb::NativeBitmap>( path, xSize, ySize, rawData ) );
       return id;
     }
     
