@@ -1,3 +1,4 @@
+
 #include <array>
 #include <string>
 #include <iostream>
@@ -54,13 +55,20 @@ namespace RunTheWorld {
 
   std::vector<char> readToBuffer(FILE *fileDescriptor) {
     const unsigned N = 1024;
-    std::vector<char> total;
-    while (true) {
+
+    fseek(fileDescriptor, 0, SEEK_END);
+    auto endPos = ftell( fileDescriptor );
+    rewind(fileDescriptor);
+    std::vector<char> total(endPos);
+    auto writeHead = std::begin( total );
+    
+    for ( int c = 0; c < endPos; ++c ) {
       char buffer[N];
       size_t read = fread((void *) &buffer[0], 1, N, fileDescriptor);
       if (read) {
 	for (int c = 0; c < read; ++c) {
-	  total.push_back(buffer[c]);
+	  *writeHead = (buffer[c]);
+	  writeHead = std::next(writeHead);
 	}
       }
       if (read < N) {
@@ -101,7 +109,7 @@ namespace RunTheWorld {
       
       id = mSprites.size() + 1;
       
-      std::cout << "loading " << path << std::endl;
+      std::cout << ".";
 
       auto buffer = loadBinaryFileFromPath( path );
       int xSize;
@@ -110,10 +118,32 @@ namespace RunTheWorld {
       
       auto image = stbi_load_from_memory((const stbi_uc *) buffer.data(), buffer.size(), &xSize, &ySize, &components, 0 );
       auto rawData = new int[ xSize * ySize ];
-      std::memcpy( rawData, image, xSize * ySize * 4 );
+      std::memcpy( rawData, image, xSize * ySize * ( components ) );
       stbi_image_free(image);
-      mSprites.push_back( std::make_shared<odb::NativeBitmap>( path, xSize, ySize, rawData ) );
-      return id;
+
+        for ( int c = 0; c < xSize * ySize; ++c  ) {
+        int origin = rawData[ c ];
+
+        int r = (origin & 0xFF000000) >> 24;
+        int g = (origin & 0x00FF0000) >> 16;
+        int b = (origin & 0x0000FF00) >> 8;
+        int a = (origin & 0x000000FF);
+
+        int r20 = (( r / 21 ) * 21 );
+        int g20 = (( g / 21 ) * 21 );
+        int b20 = (( b / 21) * 21 );
+
+        int pixel = a;
+        pixel += ( r20 << 24 );
+        pixel += ( g20 << 16 );
+        pixel += ( b20 <<  8 );
+
+        rawData[ c ] = pixel;
+    }
+
+        mSprites.push_back( std::make_shared<odb::NativeBitmap>( path, xSize, ySize, rawData ) );
+
+        return id;
     }
     
     Vipper::IRenderer::SoundId CDOSRenderer::loadSound( std::string path ) {
@@ -124,16 +154,16 @@ namespace RunTheWorld {
       return 0;
     }
 
-  void CDOSRenderer::fill(float x0, float x1, float y0, float x2, float x3, float y1, std::array<int, 4> shade ) {
+  void CDOSRenderer::fill(int x0, int x1, int y0, int x2, int x3, int y1, std::array<int, 4> shade ) {
       
-        float fromY = std::min( y0, y1 );
-        float toY = std::max( y0, y1 );
+        int fromY = std::min( y0, y1 );
+        int toY = std::max( y0, y1 );
         float deltaY = toY - fromY;
 
         float ratiox0x2 = 1.0f;
         float ratiox1x3 = 1.0f;
 
-        if ( toY - fromY > 0.0f  ) {
+        if ( toY - fromY > 0  ) {
             ratiox0x2 = ( x0 - x2 ) / deltaY;
             ratiox1x3 = ( x1 - x3 ) / deltaY;
         }
@@ -144,7 +174,7 @@ namespace RunTheWorld {
         for ( int line = toY; line >= fromY; line--) {
             x -= ratiox0x2;
             fx -= ratiox1x3;
-	    drawSquare( (int)x, line, (int)fx, line + 1, shade );
+	        drawSquare( (int)x, line, (int)fx, line + 1, shade );
         }
     }
 
@@ -154,19 +184,23 @@ namespace RunTheWorld {
       int _y0 = (y1 * 200) / 480;
       int _y1 = (y2 * 200 ) / 480;
 
-      int pixel = colour[ 3 ];
-      pixel += colour[ 2 ] << 8;
-      pixel += colour[ 1 ] << 8;
+      int pixel = 0;
+
+
+        pixel += colour[ 0 ];
+        pixel += colour[ 1 ] << 8;
+        pixel += colour[ 2 ] << 16;
+        pixel += colour[ 3 ] << 24;
       
       for ( int y = _y0; y < _y1; ++y ) {
-	for ( int x = _x0; x < _x1; ++x ) {
+        for ( int x = _x0; x < _x1; ++x ) {
 
-	  if ( x < 0 || x >= 320 || y < 0 || y >= 200 ) {
-	    continue;
-	  }
-	  
-	  mBuffer[ (320 * y ) + x ] = pixel;
-	}
+          if ( x < 0 || x >= 320 || y < 0 || y >= 200 ) {
+            continue;
+          }
+
+          mBuffer[ (320 * y ) + x ] = pixel;
+        }
       }
     };
     
@@ -182,7 +216,7 @@ namespace RunTheWorld {
     };
 
   void CDOSRenderer::drawBitmapAt( int dx, int dy, int w, int h, const IRenderer::BitmapId id ) {
-      auto bitmap = mSprites[ id ];
+      auto bitmap = mSprites[ id - 1];
       auto data = bitmap->getPixelData();
 
       int x = 0;
@@ -200,7 +234,7 @@ namespace RunTheWorld {
 	  auto pixel = data + ( sy * bitmap->getWidth() ) + sx;
 	  auto colour = *pixel;
 
-	  if ( (colour & 0xFF000000 ) < 254 ) {
+	  if ( (colour & 0xFF000000 ) < 255 ) {
 	    continue;
 	  }
 	  
@@ -223,11 +257,11 @@ namespace RunTheWorld {
     outp(0x03c8, 0);
 
     for ( int r = 0; r < 4; ++r ) {
-      for ( int g = 0; g < 4; ++g ) {
-	for ( int b = 0; b < 4; ++b ) {
-	  outp(0x03c9, (r * (85) ) );
-	  outp(0x03c9, (g * (85) ) );
-	  outp(0x03c9, (b * (85) ) );
+      for ( int g = 0; g < 8; ++g ) {
+	for ( int b = 0; b < 8; ++b ) {
+	  outp(0x03c9, (r * (21) ) );
+	  outp(0x03c9, (g * (8) ) );
+	  outp(0x03c9, (b * (8) ) );
 	}
       }
     }
@@ -239,42 +273,55 @@ namespace RunTheWorld {
   }
 
   void CDOSRenderer::update() {
+      auto lastKey = bioskey(0x11);
 
-    while ( kbhit() ) {
-      switch ( getch() ) {
-      case 'a':
-	dispatchKeyDownToListeners(Vipper::ECommand::kLeft);
-	dispatchKeyUpToListeners(Vipper::ECommand::kLeft);
-	break;
-      case 'd':
-	dispatchKeyDownToListeners(Vipper::ECommand::kRight);
-	dispatchKeyUpToListeners(Vipper::ECommand::kRight);
-	break;
-	
-      case 'w':
-	dispatchKeyDownToListeners(Vipper::ECommand::kUp);
-	dispatchKeyUpToListeners(Vipper::ECommand::kUp);
-	break;
-	
-      case 's':
-	dispatchKeyDownToListeners(Vipper::ECommand::kDown);
-	dispatchKeyUpToListeners(Vipper::ECommand::kDown);
-	break;
-      case 'z':
-	dispatchKeyDownToListeners(Vipper::ECommand::kFire1);
-	dispatchKeyUpToListeners(Vipper::ECommand::kFire1);
-	break;
-      default:
-	break;
+      bdos(0xC, 0, 0);
+
+      switch (lastKey) {
+          case 18656:
+              //up
+              dispatchKeyDownToListeners(Vipper::ECommand::kUp);
+              dispatchKeyUpToListeners(Vipper::ECommand::kUp);
+              break;
+
+          case 8051:
+          case 20704:
+              //down
+              dispatchKeyDownToListeners(Vipper::ECommand::kDown);
+              dispatchKeyUpToListeners(Vipper::ECommand::kDown);
+              break;
+
+          case 19424: //right arrow
+          case 4209: //q
+              //left
+              dispatchKeyDownToListeners(Vipper::ECommand::kLeft);
+              dispatchKeyUpToListeners(Vipper::ECommand::kLeft);
+              break;
+
+          case 4709: //e
+          case 19936: //right arrow
+              //right
+              dispatchKeyDownToListeners(Vipper::ECommand::kRight);
+              dispatchKeyUpToListeners(Vipper::ECommand::kRight);
+              break;
+
+          case 3849:
+          case 14624:
+          case 11785: //c
+          case 5236: //t
+              //space
+              dispatchKeyDownToListeners(Vipper::ECommand::kFire1);
+              dispatchKeyUpToListeners(Vipper::ECommand::kFire1);
+              break;
+
       }
-    }
   }
 
   unsigned char getPaletteEntry( int origin ) {
     unsigned char shade = 0;
-    shade += (((((origin & 0x0000FF)      ) * 4  ) / 255 ) ) << 4;
-    shade += (((((origin & 0x00FF00) >> 8 ) * 4  ) / 255 ) ) << 2;
-    shade += (((((origin & 0xFF0000) >> 16) * 4  ) / 255 ) ) << 0;
+    shade += (((((origin & 0x0000FF)      ) << 2  ) >> 8 ) ) << 6;
+    shade += (((((origin & 0x00FF00) >> 8 ) << 3  ) >> 8 ) ) << 3;
+    shade += (((((origin & 0xFF0000) >> 16) << 3  ) >> 8 ) ) << 0;
     return shade;
   }
   
@@ -304,7 +351,11 @@ namespace RunTheWorld {
       }
     }
 
+    //    std::copy( std::begin(mBuffer), std::end(mBuffer), std::begin(mLastBuffer) );
+    mFrame++;
     dosmemput(buffer, 64000, 0xa0000);
+    gotoxy(1,1);
+      printf("%d", mFrame);
     return;
     
     for ( int y = 0; y < 25; ++y ) {
@@ -319,6 +370,6 @@ namespace RunTheWorld {
     }
     std::cout.flush();
     std::fill( std::begin( mTextBuffer), std::end( mTextBuffer ), ' ' );
-    
+
   }
 }

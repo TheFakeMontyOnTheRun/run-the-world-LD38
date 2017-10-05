@@ -68,32 +68,32 @@ namespace RunTheWorld {
 
         mUIFont = renderer->loadFont( "res/albaregular.ttf", 15 );
 	}
-	
+
     void CGameplayView::drawTextAt( std::pair<int, int> position, std::string text ) {
 		auto renderer = getRenderer();
 		renderer->drawTextAt( position.first, position.second, text, {0xFF, 0xFF, 0x00, 0xFF }, mUIFont  );
 	}
-	
+
     void CGameplayView::drawGaugeAt( std::pair<int, int> position, int howFilled) {
 		auto renderer = getRenderer();
 		renderer->drawSquare(position.first, position.second, 100, position.second + 20, {0,0,255,255});
 		renderer->drawSquare(position.first, position.second, howFilled, position.second + 20, {255,0,0,255});
 	}
-	
+
     void CGameplayView::show() {
         auto game = this->mGameSession->getLevel();
-        
+
 		auto renderer = getRenderer();
-		renderer->drawSquare( 0, 0, 640 - 64, 480, {0,0,0,255} );
+//		renderer->drawSquare( 0, 0, 640 - 64, 480, {0,0,0,255} );
 
 
                 int numberOfStripeShades = 4;
-                float completelyArbitraryCurveEasingFactor = 100.0f;
+                int completelyArbitraryCurveEasingFactor = 100;
                 int shapeDelta = 0;
-                float roadWidth = 1.0f;
+                int roadWidth = 1;
                 char shape = game->track[game->elementIndex];
                 char slope = game->slopes[game->elementIndex];
-                auto camera = Vec3( 0.5f * (game->x)/ 640.0f, 0.2f, 0.1f * ( game->carSpeed / 50.0f ) );
+                auto camera = Vec3( (game->x)/ (640 * 2), 0.2f,  ( game->carSpeed / 500 ) );
 
                 if (shape == ')') {
                     shapeDelta = -1;
@@ -137,7 +137,7 @@ namespace RunTheWorld {
                 int shadingStripesCount = 0;
                 for (int y = 0; y < halfScreenHeight + slopeAddedLines + 1; ++y ) {
                     auto line = ( halfScreenHeight - slopeAddedLines ) + y;
-                    renderer->fill( 0, 640, line, 0, 640, line + 1, {0, 0, 64, 0});
+                    renderer->fill( 0, 640, line, 0, 640, line + 1, {0, 64, 0, 0});
                 }
 
                 Vec2 previousLeft(-1, -1);
@@ -149,7 +149,7 @@ namespace RunTheWorld {
                 float currentStripeHeight = initialSlope;
                 float stripeHeightDelta =  (-initialSlope) / 480.0f;
 
-                for (float y = halfScreenHeight; y > -1; y -= (0.5f )) {
+                for (int y = halfScreenHeight; y > -1; y--) {
                     shadingStripesCount = ( shadingStripesCount + 1) % 1024;
 
                     currentStripeHeight = initialSlope + ( (2.0f * (halfScreenHeight - y)) * stripeHeightDelta );
@@ -165,31 +165,31 @@ namespace RunTheWorld {
                     }
 
                     int count = (- shadingStripesCount + static_cast<long>(game->distanceRan) ) % numberOfStripeShades;
-                    renderer->fill( leftPoint.x, rightPoint.x, leftPoint.y, previousLeft.x, previousRight.x, previousLeft.y, {0, 255 * ( count + 10 ) / 20, 255 * ( count + 10 ) / 20, 255 * ( count + 10 ) / 20 } );
+                    renderer->fill( leftPoint.x, rightPoint.x, leftPoint.y, previousLeft.x, previousRight.x, previousLeft.y, {255 * ( count + 10 ) / 20, 255 * ( count + 10 ) / 20, 255 * ( count + 10 ) / 20, 255 } );
 
                     previousLeft = leftPoint;
                     previousRight = rightPoint;
                 }
 
                 initialSlope = CLevel::kSlopeHeightInMeters * (distanceToCurrentShape/ static_cast<float>(CLevel::kSegmentLengthInMeters)) * slopeDelta;
-                stripeHeightDelta =  (-initialSlope) / 480.0f;
+                stripeHeightDelta =  (-initialSlope) / 480;
 
                 auto cars = game->getCarsAhead(1024);
-                auto playerLane = (game->x)/640.0f;
+                auto playerLane = (game->x)/640;
 
                 for ( auto foe : cars ) {
                     auto y = std::get<0>(foe) - game->distanceRan;
                     float curve = (distanceToCurrentShape / static_cast<float>(CLevel::kSegmentLengthInMeters)) * shapeDelta * y * y / completelyArbitraryCurveEasingFactor;
 
                     auto lane = std::get<1>(foe);
-                    currentStripeHeight = initialSlope + ( (2.0f * (halfScreenHeight - y + 1)) * stripeHeightDelta );
-                    auto carProjection0 = project( Vec3( curve + lane - 0.2f, -1.0f + currentStripeHeight, -y + 0), camera);
-                    auto carProjection1 = project( Vec3( curve + lane + 0.2f, -1.0f + currentStripeHeight, -y + 0), camera);
-                    currentStripeHeight = initialSlope + ( (2.0f * (halfScreenHeight - y - 1)) * stripeHeightDelta );
-                    auto carProjection2 = project( Vec3( curve + lane - 0.2f, -1.0f + currentStripeHeight, -y - 1), camera);
-                    auto carProjection3 = project( Vec3( curve + lane + 0.2f, -1.0f + currentStripeHeight, -y - 1), camera);
+                    currentStripeHeight = initialSlope + ( (2 * (halfScreenHeight - y + 1)) * stripeHeightDelta );
+                    auto carProjection0 = project( Vec3( curve + lane - 0.2f, -1 + currentStripeHeight, -y + 0), camera);
+                    auto carProjection1 = project( Vec3( curve + lane + 0.2f, -1 + currentStripeHeight, -y + 0), camera);
+                    currentStripeHeight = initialSlope + ( (2 * (halfScreenHeight - y - 1)) * stripeHeightDelta );
+                    auto carProjection2 = project( Vec3( curve + lane - 0.2f, -1 + currentStripeHeight, -y - 1), camera);
+                    auto carProjection3 = project( Vec3( curve + lane + 0.2f, -1 + currentStripeHeight, -y - 1), camera);
 
-                    int carSprite = (lane + 0.5) + 1;
+                    int carSprite = (lane + 1) + 1;
                     int carSize = 0;
 
                     int sizeX = 32;
@@ -220,18 +220,18 @@ namespace RunTheWorld {
 
 
                 {
-                    auto lane = (game->x) / 640.0f;
-                    currentStripeHeight = initialSlope + ( (2.0f * (halfScreenHeight -4.1)) * stripeHeightDelta );
-                    auto carProjection2 = project(Vec3(lane -0.2f, -1.0f + currentStripeHeight, -2 -1.1), camera);
-                    auto carProjection3 = project(Vec3(lane +0.2f, -1.0f + currentStripeHeight, -2 -1.1), camera);
-                    currentStripeHeight = initialSlope + ( (2.0f * (halfScreenHeight -2.1)) * stripeHeightDelta );
-                    auto carProjection0 = project(Vec3(lane -0.2f, -1.0f + currentStripeHeight, -2 -0.1), camera);
-                    auto carProjection1 = project(Vec3(lane +0.2f, -1.0f + currentStripeHeight, -2 -0.1), camera);
+                    auto lane = (game->x) / 640;
+                    currentStripeHeight = initialSlope + ( (2 * (halfScreenHeight -4)) * stripeHeightDelta );
+                    auto carProjection2 = project(Vec3(lane -0.2f, -1 + currentStripeHeight, -2 -1), camera);
+                    auto carProjection3 = project(Vec3(lane +0.2f, -1 + currentStripeHeight, -2 -1), camera);
+                    currentStripeHeight = initialSlope + ( (2 * (halfScreenHeight -2.1)) * stripeHeightDelta );
+                    auto carProjection0 = project(Vec3(lane -0.2f, -1 + currentStripeHeight, -2 ), camera);
+                    auto carProjection1 = project(Vec3(lane +0.2f, -1 + currentStripeHeight, -2 ), camera);
 
                     int black[3] = {0,0,0};
                     auto centerX = carProjection0.x + ((carProjection1.x - carProjection0.x) / 2);
                     auto centerY = carProjection0.y + ((carProjection2.y - carProjection0.y) / 2);
-                    int carSprite = (lane + 0.5) + 1;
+                    int carSprite = (lane + 1) + 1;
                     renderer->fill( carProjection0.x, carProjection1.x, carProjection0.y, carProjection2.x, carProjection3.x, centerY, {0,0,0,0} );
                     renderer->drawBitmapAt(centerX - 64, centerY - 32, 128, 32, mCar[carSprite][0]);
 
