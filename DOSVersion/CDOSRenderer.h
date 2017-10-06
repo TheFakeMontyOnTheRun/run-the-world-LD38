@@ -4,7 +4,8 @@
 namespace RunTheWorld {
 
   class CDOSRenderer : public Vipper::IRenderer {
-    std::array<unsigned int, 320 * 200 > mBuffer;
+      unsigned char mFinalBuffer[ 320 * 200 ];
+      std::array<unsigned int, 320 * 200 > mBuffer;
     std::array<char, 80 * 25 > mTextBuffer;
     std::vector<std::shared_ptr<odb::NativeBitmap>> mSprites;
     long mFrame = 0;
