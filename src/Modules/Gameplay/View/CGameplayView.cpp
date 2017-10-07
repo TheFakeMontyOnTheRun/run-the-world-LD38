@@ -87,10 +87,9 @@ namespace RunTheWorld {
         int numberOfStripeShades = 4;
         int completelyArbitraryCurveEasingFactor = 100;
         int shapeDelta = 0;
-        int roadWidth = 1;
         char shape = game->track[game->elementIndex];
         char slope = game->slopes[game->elementIndex];
-        auto camera = Vec3((game->x) / (640 * 2), 0.2f, (game->carSpeed / 500));
+        Vec3 camera = Vec3((game->x) / (640 * 2), 0.2f, (game->carSpeed / 500));
 
         if (shape == ')') {
             shapeDelta = -1;
@@ -120,7 +119,7 @@ namespace RunTheWorld {
 
         int halfScreenHeight = 480 / 2;
 
-        auto slopeAddedLines = (2 * CLevel::kSlopeHeightInMeters *
+        float slopeAddedLines = (2 * CLevel::kSlopeHeightInMeters *
                                 (distanceToCurrentShape / static_cast<float>(CLevel::kSegmentLengthInMeters)) *
                                 slopeDelta);
 
@@ -148,18 +147,19 @@ namespace RunTheWorld {
         float initialSlope = CLevel::kSlopeHeightInMeters *
                              (distanceToCurrentShape / static_cast<float>(CLevel::kSegmentLengthInMeters)) * slopeDelta;
         float currentStripeHeight = initialSlope;
-        float stripeHeightDelta = (-initialSlope) / 480.0f;
+        float stripeHeightDelta = (-initialSlope) / 480;
 
         for (int y = halfScreenHeight; y > -1; y--) {
             shadingStripesCount = (shadingStripesCount + 1) % 1024;
 
-            currentStripeHeight = initialSlope + ((2.0f * (halfScreenHeight - y)) * stripeHeightDelta);
+            currentStripeHeight = initialSlope + ((2 * (halfScreenHeight - y)) * stripeHeightDelta);
 
             float curve =
                     (distanceToCurrentShape / static_cast<float>(CLevel::kSegmentLengthInMeters)) * shapeDelta * y * y /
                     completelyArbitraryCurveEasingFactor;
-            auto leftPoint = project(Vec3(-(roadWidth / 2.0f) + curve, -0.5f + currentStripeHeight, -y), camera);
-            auto rightPoint = project(Vec3((roadWidth / 2.0f) + curve, -0.5f + currentStripeHeight, -y), camera);
+
+            Vec2 leftPoint = project(Vec3(curve - 1, -1 + currentStripeHeight, -y), camera);
+            Vec2 rightPoint = project(Vec3(curve + 1, -1 + currentStripeHeight, -y), camera);
 
             //if it's valid
             if (previousLeft.y < 0) {
@@ -168,8 +168,11 @@ namespace RunTheWorld {
             }
 
             int count = (-shadingStripesCount + static_cast<long>(game->distanceRan)) % numberOfStripeShades;
+
+            int shade = ((count + 16) * 256) / 32;
+
             renderer->fill(leftPoint.x, rightPoint.x, leftPoint.y, previousLeft.x, previousRight.x, previousLeft.y,
-                           {255 * (count + 10) / 20, 255 * (count + 10) / 20, 255 * (count + 10) / 20, 255});
+                           {shade, shade, shade, 255});
 
             previousLeft = leftPoint;
             previousRight = rightPoint;
@@ -180,21 +183,22 @@ namespace RunTheWorld {
         stripeHeightDelta = (-initialSlope) / 480;
 
         auto cars = game->getCarsAhead(1024);
-        auto playerLane = (game->x) / 640;
+
+        float playerLane = (game->x) / 640;
 
         for (auto foe : cars) {
-            auto y = std::get<0>(foe) - game->distanceRan;
+            float y = std::get<0>(foe) - game->distanceRan;
             float curve =
                     (distanceToCurrentShape / static_cast<float>(CLevel::kSegmentLengthInMeters)) * shapeDelta * y * y /
                     completelyArbitraryCurveEasingFactor;
 
-            auto lane = std::get<1>(foe);
+            float lane = std::get<1>(foe);
             currentStripeHeight = initialSlope + ((2 * (halfScreenHeight - y + 1)) * stripeHeightDelta);
-            auto carProjection0 = project(Vec3(curve + lane - 0.2f, -1 + currentStripeHeight, -y + 0), camera);
-            auto carProjection1 = project(Vec3(curve + lane + 0.2f, -1 + currentStripeHeight, -y + 0), camera);
+            Vec2 carProjection0 = project(Vec3(curve + lane - 0.2f, -1 + currentStripeHeight, -y + 0), camera);
+            Vec2 carProjection1 = project(Vec3(curve + lane + 0.2f, -1 + currentStripeHeight, -y + 0), camera);
             currentStripeHeight = initialSlope + ((2 * (halfScreenHeight - y - 1)) * stripeHeightDelta);
-            auto carProjection2 = project(Vec3(curve + lane - 0.2f, -1 + currentStripeHeight, -y - 1), camera);
-            auto carProjection3 = project(Vec3(curve + lane + 0.2f, -1 + currentStripeHeight, -y - 1), camera);
+            Vec2 carProjection2 = project(Vec3(curve + lane - 0.2f, -1 + currentStripeHeight, -y - 1), camera);
+            Vec2 carProjection3 = project(Vec3(curve + lane + 0.2f, -1 + currentStripeHeight, -y - 1), camera);
 
             int carSprite = (lane + 1) + 1;
             int carSize = 0;
@@ -219,8 +223,8 @@ namespace RunTheWorld {
             }
 
 
-            auto centerX = carProjection0.x + ((carProjection1.x - carProjection0.x) / 2);
-            auto centerY = carProjection0.y + ((carProjection2.y - carProjection0.y) / 2);
+            float centerX = carProjection0.x + ((carProjection1.x - carProjection0.x) / 2);
+            float centerY = carProjection0.y + ((carProjection2.y - carProjection0.y) / 2);
             renderer->fill(carProjection0.x, carProjection1.x, carProjection0.y, carProjection2.x, carProjection3.x,
                            centerY, {0, 0, 0, 0});
             renderer->drawBitmapAt(centerX - (sizeX / 2), centerY - (sizeY / 2), sizeX, sizeY,
@@ -229,17 +233,16 @@ namespace RunTheWorld {
 
 
         {
-            auto lane = (game->x) / 640;
+            float lane = (game->x) / 640;
             currentStripeHeight = initialSlope + ((2 * (halfScreenHeight - 4)) * stripeHeightDelta);
-            auto carProjection2 = project(Vec3(lane - 0.2f, -1 + currentStripeHeight, -2 - 1), camera);
-            auto carProjection3 = project(Vec3(lane + 0.2f, -1 + currentStripeHeight, -2 - 1), camera);
+            Vec2 carProjection2 = project(Vec3(lane - 0.2f, -1 + currentStripeHeight, -2 - 1), camera);
+            Vec2 carProjection3 = project(Vec3(lane + 0.2f, -1 + currentStripeHeight, -2 - 1), camera);
             currentStripeHeight = initialSlope + ((2 * (halfScreenHeight - 2.1)) * stripeHeightDelta);
-            auto carProjection0 = project(Vec3(lane - 0.2f, -1 + currentStripeHeight, -2), camera);
-            auto carProjection1 = project(Vec3(lane + 0.2f, -1 + currentStripeHeight, -2), camera);
+            Vec2 carProjection0 = project(Vec3(lane - 0.2f, -1 + currentStripeHeight, -2), camera);
+            Vec2 carProjection1 = project(Vec3(lane + 0.2f, -1 + currentStripeHeight, -2), camera);
 
-            int black[3] = {0, 0, 0};
-            auto centerX = carProjection0.x + ((carProjection1.x - carProjection0.x) / 2);
-            auto centerY = carProjection0.y + ((carProjection2.y - carProjection0.y) / 2);
+            float centerX = carProjection0.x + ((carProjection1.x - carProjection0.x) / 2);
+            float centerY = carProjection0.y + ((carProjection2.y - carProjection0.y) / 2);
             int carSprite = (lane + 1) + 1;
             renderer->fill(carProjection0.x, carProjection1.x, carProjection0.y, carProjection2.x, carProjection3.x,
                            centerY, {0, 0, 0, 0});
