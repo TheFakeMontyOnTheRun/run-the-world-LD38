@@ -11,6 +11,7 @@
 #include <vector>
 #include <memory>
 #include <map>
+#include <iostream>
 #include "Vipper/Vipper.h"
 #include "Modules/Gameplay/Entities/CLevel.h"
 
@@ -27,29 +28,28 @@ namespace RunTheWorld {
         std::random_device rd;
         std::mt19937 gen(rd());
 
-        std::uniform_real_distribution<> speedRandom(1.0f, 50.0f);
-        std::uniform_real_distribution<> laneRandom(-1.0f, 1.0f);
+        std::uniform_real_distribution<> speedRandom(1, 50);
+        std::uniform_real_distribution<> laneRandom(-1, 1);
         std::uniform_real_distribution<> positionRandom( 10, track.size() * kSegmentLengthInMeters * kZones);
 
-        for( int c = 0; c < 200; ++c ) {
+        for( int c = 0; c < 128; ++c ) {
             mCars.push_back( std::make_tuple( positionRandom( gen ), laneRandom( gen ), speedRandom( gen ) ) );
         }
     }
 
     void CLevel::tick(long ms) {
         timeEllapsed += ms;
-
         //20 km/h
         //1h = 60 minutes * 60 seconds * 1000 ms
-        float secondsSinceLastTick = ms / 1000.0f;
-        float distanceSinceLastTick = carSpeed * secondsSinceLastTick;
+        int secondsSinceLastTick = (100 * ms) / 1000;
+        int distanceSinceLastTick = (carSpeed * secondsSinceLastTick) / 100;
         timeLeft -= ms;
         distanceRan += distanceSinceLastTick;
         distanceToNextElement -= distanceSinceLastTick;
 
         smoking = ( carSpeed > 0 && carSpeed < 20 );
 
-        auto playerLane = x / 640.0f;
+        auto playerLane = x / 640;
 
 
 
@@ -70,8 +70,8 @@ namespace RunTheWorld {
                         (cz0 <= pz1 && pz1 <= cz1) ||
                         ( pz0 <= cz1 && cz1 <= pz1) ) {
 
-                if (((playerLane - 0.2f) <= (lane - 0.2f) && (lane - 0.2f) <= (playerLane + 0.2f)) ||
-                    ((playerLane - 0.2f) <= (lane + 0.2f) && (lane + 0.2f) <= (playerLane + 0.2f))) {
+                if (((playerLane - 1) <= (lane - 1) && (lane - 1) <= (playerLane + 1)) ||
+                    ((playerLane - 1) <= (lane + 1) && (lane + 1) <= (playerLane + 1))) {
                     carSpeed = 0.0;
                     std::get<0>(car) = distanceRan + std::get<2>(car) / 2 + 10 + carSpeed / 2;
                     std::get<2>(car) += carSpeed / 2;
@@ -96,7 +96,7 @@ namespace RunTheWorld {
         }
 
         if ( carSpeed > 0 ) {
-            x += xSpeed * (carSpeed + 2) * 0.2f;
+            x += xSpeed * (carSpeed + 2) / 8;
         }
 
         if ( distanceToNextElement < ( kSegmentLengthInMeters / 2) ) {
@@ -106,15 +106,15 @@ namespace RunTheWorld {
 
             if (shape == ')') {
                 shapeDelta = -1;
-                x+= 0.15f * carSpeed;
+                x+= carSpeed / 8;
             }
 
             if (shape == '(') {
                 shapeDelta = 1;
-                x-= 0.15f * carSpeed;
+                x-= carSpeed / 8;
             }
 
-            mHeading -= carSpeed * (shapeDelta / 1000.0f) + ( x / (640.0f * 10000.0f) );
+            mHeading -= carSpeed * (shapeDelta / 1000) + ( x / (640 * 10000) );
         }
 
 

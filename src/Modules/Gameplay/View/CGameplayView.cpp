@@ -14,10 +14,11 @@
 namespace RunTheWorld {
 
     Vec2 project(Vec3 v, Vec3 camera) {
-        float xz = (v.x - camera.x) / (1.0f - v.z + camera.z);
-        float yz = (v.y - camera.y) / (1.0f - v.z + camera.z);
+        FixP one{1};
+        auto xz = (v.x - camera.x) / (one - v.z + camera.z);
+        auto yz = (v.y - camera.y) / (one - v.z + camera.z);
 
-        Vec2 v2(320 + (xz * 640), 240 - (yz * 480));
+        Vec2 v2(FixP{320} + (xz * FixP{640}), FixP{240} - (yz * FixP{480}));
         return v2;
     }
 
@@ -83,13 +84,18 @@ namespace RunTheWorld {
 
         auto renderer = getRenderer();
 
+        auto halfPart = FixP{2} / FixP{10};
+        auto one = FixP{1};
+        auto two = FixP{2};
+        auto four = FixP{4};
+        auto misterious = two;
 
         int numberOfStripeShades = 4;
         int completelyArbitraryCurveEasingFactor = 100;
         int shapeDelta = 0;
         char shape = game->track[game->elementIndex];
         char slope = game->slopes[game->elementIndex];
-        Vec3 camera = Vec3((game->x) / (640 * 2), 0.2f, (game->carSpeed / 500));
+        Vec3 camera = Vec3( FixP{(game->x) / (640 * 2)}, halfPart, FixP{(game->carSpeed / 500)});
 
         if (shape == ')') {
             shapeDelta = -1;
@@ -144,8 +150,10 @@ namespace RunTheWorld {
 
         shadingStripesCount = 0;
 
-        float initialSlope = CLevel::kSlopeHeightInMeters *
-                             (distanceToCurrentShape / static_cast<float>(CLevel::kSegmentLengthInMeters)) * slopeDelta;
+        float segmentLength = static_cast<float>(CLevel::kSegmentLengthInMeters);
+
+        auto initialSlope = CLevel::kSlopeHeightInMeters *
+                             (distanceToCurrentShape / segmentLength ) * slopeDelta;
         float currentStripeHeight = initialSlope;
         float stripeHeightDelta = (-initialSlope) / 480;
 
@@ -223,33 +231,51 @@ namespace RunTheWorld {
             }
 
 
-            float centerX = carProjection0.x + ((carProjection1.x - carProjection0.x) / 2);
-            float centerY = carProjection0.y + ((carProjection2.y - carProjection0.y) / 2);
-            renderer->fill(carProjection0.x, carProjection1.x, carProjection0.y, carProjection2.x, carProjection3.x,
-                           centerY, {0, 0, 0, 0});
-            renderer->drawBitmapAt(centerX - (sizeX / 2), centerY - (sizeY / 2), sizeX, sizeY,
+            auto centerX = carProjection0.x + ((carProjection1.x - carProjection0.x) / two);
+            auto centerY = carProjection0.y + ((carProjection2.y - carProjection0.y) / two);
+
+            renderer->fill(static_cast<int>(carProjection0.x),
+                           static_cast<int>(carProjection1.x),
+                           static_cast<int>(carProjection0.y),
+                           static_cast<int>(carProjection2.x),
+                           static_cast<int>(carProjection3.x),
+                           static_cast<int>(centerY),
+                           {0, 0, 0, 0});
+
+
+            renderer->drawBitmapAt(static_cast<int>(centerX) - (sizeX / 2),
+                                   static_cast<int>(centerY) - (sizeY / 2),
+                                   sizeX,
+                                   sizeY,
                                    mOtherCar[carSprite][carSize]);
         }
 
 
         {
-            float lane = (game->x) / 640;
-            currentStripeHeight = initialSlope + ((2 * (halfScreenHeight - 4)) * stripeHeightDelta);
-            Vec2 carProjection2 = project(Vec3(lane - 0.2f, -1 + currentStripeHeight, -2 - 1), camera);
-            Vec2 carProjection3 = project(Vec3(lane + 0.2f, -1 + currentStripeHeight, -2 - 1), camera);
-            currentStripeHeight = initialSlope + ((2 * (halfScreenHeight - 2.1)) * stripeHeightDelta);
-            Vec2 carProjection0 = project(Vec3(lane - 0.2f, -1 + currentStripeHeight, -2), camera);
-            Vec2 carProjection1 = project(Vec3(lane + 0.2f, -1 + currentStripeHeight, -2), camera);
+            auto lane = FixP{game->x} / FixP{640};
 
-            float centerX = carProjection0.x + ((carProjection1.x - carProjection0.x) / 2);
-            float centerY = carProjection0.y + ((carProjection2.y - carProjection0.y) / 2);
-            int carSprite = (lane + 1) + 1;
-            renderer->fill(carProjection0.x, carProjection1.x, carProjection0.y, carProjection2.x, carProjection3.x,
-                           centerY, {0, 0, 0, 0});
-            renderer->drawBitmapAt(centerX - 64, centerY - 32, 128, 32, mCar[carSprite][0]);
+            auto fixCurrentStripeHeight = initialSlope + ((2 * (halfScreenHeight - 4)) * stripeHeightDelta);
+            Vec2 carProjection2 = project(Vec3(lane - halfPart, -one + fixCurrentStripeHeight, -two - one), camera);
+            Vec2 carProjection3 = project(Vec3(lane + halfPart, -one + fixCurrentStripeHeight, -two - one), camera);
+            currentStripeHeight = initialSlope + ((two * (halfScreenHeight - misterious)) * stripeHeightDelta);
+            Vec2 carProjection0 = project(Vec3(lane - halfPart, -one + fixCurrentStripeHeight, -two), camera);
+            Vec2 carProjection1 = project(Vec3(lane + halfPart, -one + fixCurrentStripeHeight, -two), camera);
+
+            auto centerX = carProjection0.x + ((carProjection1.x - carProjection0.x) / two);
+            auto centerY = carProjection0.y + ((carProjection2.y - carProjection0.y) / two);
+            int carSprite = (static_cast<int>(lane) + 1) + 1;
+            renderer->fill(static_cast<int>(carProjection0.x),
+                           static_cast<int>(carProjection1.x),
+                           static_cast<int>(carProjection0.y),
+                           static_cast<int>(carProjection2.x),
+                           static_cast<int>(carProjection3.x),
+                           static_cast<int>(centerY),
+                           {0, 0, 0, 0});
+
+            renderer->drawBitmapAt(static_cast<int>(centerX) - 64, static_cast<int>(centerY) - 32, 128, 32, mCar[carSprite][0]);
 
             if (game->smoking) {
-                renderer->drawBitmapAt(centerX - 64, centerY, 100, 33, mSmoke);
+                renderer->drawBitmapAt(static_cast<int>(centerX) - 64, static_cast<int>(centerY), 100, 33, mSmoke);
             }
         }
 

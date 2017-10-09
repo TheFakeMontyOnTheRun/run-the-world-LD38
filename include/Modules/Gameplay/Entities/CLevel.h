@@ -5,7 +5,7 @@
 
 namespace RunTheWorld {
 
-    using CCar = std::tuple<float, float, float>;
+    using CCar = std::tuple<int, int, int>;
 
     class CLevel : public Vipper::IRenderer::IKeyListener {
     public:
