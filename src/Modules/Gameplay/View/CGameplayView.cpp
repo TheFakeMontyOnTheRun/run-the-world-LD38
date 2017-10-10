@@ -200,13 +200,14 @@ namespace RunTheWorld {
                     (distanceToCurrentShape / static_cast<float>(CLevel::kSegmentLengthInMeters)) * shapeDelta * y * y /
                     completelyArbitraryCurveEasingFactor;
 
-            float lane = std::get<1>(foe);
-            currentStripeHeight = initialSlope + ((2 * (halfScreenHeight - y + 1)) * stripeHeightDelta);
-            Vec2 carProjection0 = project(Vec3(curve + lane - 0.2f, -1 + currentStripeHeight, -y + 0), camera);
-            Vec2 carProjection1 = project(Vec3(curve + lane + 0.2f, -1 + currentStripeHeight, -y + 0), camera);
-            currentStripeHeight = initialSlope + ((2 * (halfScreenHeight - y - 1)) * stripeHeightDelta);
-            Vec2 carProjection2 = project(Vec3(curve + lane - 0.2f, -1 + currentStripeHeight, -y - 1), camera);
-            Vec2 carProjection3 = project(Vec3(curve + lane + 0.2f, -1 + currentStripeHeight, -y - 1), camera);
+            int lane = std::get<1>(foe);
+            auto curveAndLane = FixP{lane} + FixP{curve};
+            auto fixedStripeHeight = -one + FixP{initialSlope + ((2 * (halfScreenHeight - y - 1)) * stripeHeightDelta)};
+            auto bottom = FixP{-y};
+            Vec2 carProjection0 = project(Vec3(curveAndLane - halfPart, fixedStripeHeight, bottom + 0), camera);
+            Vec2 carProjection1 = project(Vec3(curveAndLane + halfPart, fixedStripeHeight, bottom + 0), camera);
+            Vec2 carProjection2 = project(Vec3(curveAndLane - halfPart, fixedStripeHeight, bottom - one), camera);
+            Vec2 carProjection3 = project(Vec3(curveAndLane + halfPart, fixedStripeHeight, bottom - one), camera);
 
             int carSprite = (lane + 1) + 1;
             int carSize = 0;
