@@ -71,7 +71,7 @@ namespace RunTheWorld {
                         ( pz0 <= cz1 && cz1 <= pz1) ) {
 
                 if ( playerLane == lane ) {
-                    carSpeed = 0.0;
+                    carSpeed = 0;
                     std::get<0>(car) = distanceRan + std::get<2>(car) / 2 + 10 + carSpeed / 2;
                     std::get<2>(car) += carSpeed / 2;
                     hit = true;
@@ -186,21 +186,6 @@ namespace RunTheWorld {
     }
 
     std::vector<CCar> CLevel::getCarsAhead(int range) const {
-        std::vector<CCar> toReturn;
-
-        int min = distanceRan;
-        int max = distanceRan + range;
-
-        for ( auto& car : mCars ) {
-            if ( min <= std::get<0>(car) && std::get<0>(car) <= max ) {
-                toReturn.push_back( car );
-            }
-        }
-
-        std::sort( std::begin( toReturn), std::end( toReturn ), []( CCar c1, CCar c2 ) {
-            return std::get<0>( c1 ) > std::get<0>(c2);
-        });
-
-        return toReturn;
+        return mCars;
     }
 }
