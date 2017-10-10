@@ -56,7 +56,7 @@ namespace RunTheWorld {
         for ( auto& car : mCars ) {
             auto oldPosition = std::get<0>(car);
             auto speed = std::get<2>(car);
-            auto newPosition = oldPosition + ( speed * secondsSinceLastTick );
+            auto newPosition = oldPosition + ( speed * secondsSinceLastTick ) /100;
             std::get<0>(car) = newPosition;
             auto lane = std::get<1>(car);
 
@@ -70,8 +70,7 @@ namespace RunTheWorld {
                         (cz0 <= pz1 && pz1 <= cz1) ||
                         ( pz0 <= cz1 && cz1 <= pz1) ) {
 
-                if (((playerLane - 1) <= (lane - 1) && (lane - 1) <= (playerLane + 1)) ||
-                    ((playerLane - 1) <= (lane + 1) && (lane + 1) <= (playerLane + 1))) {
+                if ( playerLane == lane ) {
                     carSpeed = 0.0;
                     std::get<0>(car) = distanceRan + std::get<2>(car) / 2 + 10 + carSpeed / 2;
                     std::get<2>(car) += carSpeed / 2;
