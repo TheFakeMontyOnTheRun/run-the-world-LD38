@@ -16,19 +16,19 @@ namespace RunTheWorld {
         
     Vipper::IRenderer::BitmapId CSDLRenderer::loadBitmap( std::string path ) {
       auto id = mSprites.size() + 1;
-      mSprites[ id ] = IMG_Load( path.c_str() );
+      mSprites[ id ] = IMG_Load( ( "resSDL/" + path).c_str() );
       return id;
     }
     
     Vipper::IRenderer::SoundId CSDLRenderer::loadSound( std::string path ) {
       auto id = mSounds.size() + 1;
-      mSounds[ id ] = Mix_LoadWAV(path.c_str() );
+      mSounds[ id ] = Mix_LoadWAV( ("resSDL/" + path).c_str() );
       return id;
     }
     
     Vipper::IRenderer::FontId CSDLRenderer::loadFont( std::string path, int sizeInPt ) {
       auto id = mFonts.size() + 1;
-      mFonts[ id ] = TTF_OpenFont(path.c_str(), sizeInPt );
+      mFonts[ id ] = TTF_OpenFont(("resSDL/" + path).c_str(), sizeInPt );
 
       return id;
     }

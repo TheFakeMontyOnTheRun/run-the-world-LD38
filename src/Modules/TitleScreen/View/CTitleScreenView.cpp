@@ -14,15 +14,15 @@ namespace RunTheWorld {
 			std::dynamic_pointer_cast<CTitleScreenPresenter>(getPresenter())->onClickOnPlayButton();
 		} );
 		
-		mTitleTextFont = renderer->loadFont( "res/albasuper.ttf", 50 );
-		mCreditsTextFont = renderer->loadFont( "res/albasuper.ttf", 30 );
-#ifdef __EMSCRIPTEN__
-		mTitle = renderer->loadBitmap( "res/emtitle.png" );
+		mTitleTextFont = renderer->loadFont( "albasuper.ttf", 50 );
+		mCreditsTextFont = renderer->loadFont( "albasuper.ttf", 30 );
+#if defined(__EMSCRIPTEN__) || defined(DOS)
+		mTitle = renderer->loadBitmap( "emtitle.png" );
 #else
-        mTitle = renderer->loadBitmap( "res/title.png" );
+        mTitle = renderer->loadBitmap( "title.png" );
 #endif
 
-		mSelectedSound = renderer->loadSound( "res/selected.wav" );
+		mSelectedSound = renderer->loadSound( "selected.wav" );
 	}
 	
 	void CTitleScreenView::show() {

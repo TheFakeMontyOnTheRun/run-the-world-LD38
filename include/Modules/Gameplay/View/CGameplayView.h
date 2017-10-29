@@ -45,6 +45,10 @@ namespace RunTheWorld {
     void onKeyUp( Vipper::ECommand keyCode ) override;
       void onKeyDown( Vipper::ECommand keyCode ) override;
       void drawBackdropForHeading(int modulus, int zone  );
+
+      float getCurve(int completelyArbitraryCurveEasingFactor, int shapeDelta, int distanceToCurrentShape, int y) const;
+
+      float getInitialSlope(int slopeDelta, int distanceToCurrentShape, int segmentLength) const;
   };
 }
 #endif

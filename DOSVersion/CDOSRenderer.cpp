@@ -86,6 +86,7 @@ namespace RunTheWorld {
         fd = fopen(path.c_str(), "rb");
 
         if (fd == nullptr) {
+            std::cout << "deu ruim: " << path << std::endl;
             exit(0);
         }
 
@@ -112,7 +113,7 @@ namespace RunTheWorld {
         std::cout << ".";
         std::cout.flush();
 
-        auto buffer = loadBinaryFileFromPath(path);
+        auto buffer = loadBinaryFileFromPath("resDOS/" + path);
         int xSize;
         int ySize;
         int components;
@@ -185,9 +186,9 @@ namespace RunTheWorld {
             x -= ratiox0x2;
             fx -= ratiox1x3;
 
-            int _x0 = std::min(319, std::max(0, (static_cast<int>(x)) / 2));
-            int _x1 = std::min(319, std::max(0, ((static_cast<int>(fx)) / 2)));
-            int _y0 = std::min(199, std::max(0, (y * 10) / 24));
+            int _x0 = std::min(319, std::max(0, static_cast<int>(x) ));
+            int _x1 = std::min(319, std::max(0, static_cast<int>(fx)));
+            int _y0 = std::min(199, std::max(0, y ));
             auto line = data + (320 * _y0);
 
             std::fill(line + _x0, line + _x1, pixel);
@@ -195,10 +196,10 @@ namespace RunTheWorld {
     }
 
     void CDOSRenderer::drawSquare(int x1, int y1, int x2, int y2, std::array<int, 4> colour) {
-        int _x0 = std::min(319, std::max(0, x1 / 2));
-        int _x1 = std::min(319, std::max(0, (x2 / 2)));
-        int _y0 = std::min(199, std::max(0, (y1 * 10) / 24));
-        int _y1 = std::min(199, std::max(0, ((y2 * 10) / 24)));
+        int _x0 = std::min(319, std::max(0, x1 ));
+        int _x1 = std::min(319, std::max(0, x2 ));
+        int _y0 = std::min(199, std::max(0, y1 ));
+        int _y1 = std::min(199, std::max(0, y2 ));
 
         int pixel = 0;
         pixel += colour[0];
@@ -234,8 +235,8 @@ namespace RunTheWorld {
 
             for (int sx = 0; sx < width; ++sx) {
 
-                x = (sx + dx) / 2;
-                y = ((sy + dy) * 10) / 24;
+                x = (sx + dx);
+                y = (sy + dy);
 
                 if (x < 0 || x >= 320 || y < 0 || y >= 200) {
                     continue;

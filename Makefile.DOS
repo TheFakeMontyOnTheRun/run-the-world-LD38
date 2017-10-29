@@ -1,6 +1,6 @@
 CXX = i586-pc-msdosdjgpp-g++
 
-CXXFLAGS = -g -Iinclude -Ifixed_point/include -c -Istb -fpermissive -c -O6 -Ofast  -funroll-loops -funroll-all-loops -fomit-frame-pointer -fno-exceptions -ffast-math -mtune=i486 -march=i486 -IDOS-version
+CXXFLAGS = -g -Iinclude -Ifixed_point/include -c -DDOS -Istb -fpermissive -c -O6 -Ofast  -funroll-loops -funroll-all-loops -fomit-frame-pointer -fno-exceptions -ffast-math -mtune=i486 -march=i486 -IDOS-version
 
 LIBS = -lemu
 

@@ -12,60 +12,90 @@
 
 
 namespace RunTheWorld {
+    
+    const static auto xRes =
+#ifdef DOS
+            320;
+#else
+            640;
+#endif
+
+    const static auto xHalfRes =
+#ifdef DOS
+            160;
+#else
+            320;
+#endif
+
+
+    const static auto yRes =
+#ifdef DOS
+            200;
+#else
+            480;
+#endif
+
+    const static auto yHalfRes =
+#ifdef DOS
+            100;
+#else
+            240;
+#endif
+
 
     Vec2 project(Vec3 v, Vec3 camera) {
         FixP one{1};
         auto xz = (v.x - camera.x) / (one - v.z + camera.z);
         auto yz = (v.y - camera.y) / (one - v.z + camera.z);
 
-        Vec2 v2(FixP{320} + (xz * FixP{640}), FixP{240} - (yz * FixP{480}));
+        Vec2 v2(FixP{xHalfRes} + (xz * FixP{xRes}), FixP{yHalfRes} - (yz * FixP{yRes}));
         return v2;
     }
 
     void CGameplayView::drawBackdropForHeading(int modulus, int zone) {
-        getRenderer()->drawBitmapAt(-640 + modulus, 0, 640, 480, mBackdrop[zone]);
-        getRenderer()->drawBitmapAt(modulus, 0, 640, 480, mBackdrop[zone]);
+        getRenderer()->drawBitmapAt(-xRes + modulus, 0, xRes, yRes, mBackdrop[zone]);
+        getRenderer()->drawBitmapAt(modulus, 0, xRes, yRes, mBackdrop[zone]);
     }
 
     CGameplayView::CGameplayView(std::shared_ptr<CGameSession> session, std::shared_ptr<Vipper::IRenderer> renderer)
             : IView(renderer), mGameSession(session) {
 
-        mBackdrop[0] = renderer->loadBitmap("res/3.png");
-        mBackdrop[1] = renderer->loadBitmap("res/2.png");
-        mBackdrop[2] = renderer->loadBitmap("res/1.png");
+        mBackdrop[0] = renderer->loadBitmap("3.png");
+        mBackdrop[1] = renderer->loadBitmap("2.png");
+        mBackdrop[2] = renderer->loadBitmap("1.png");
 
-        mCar[0][0] = renderer->loadBitmap("res/big0.png");
-        mCar[1][0] = renderer->loadBitmap("res/big1.png");
-        mCar[2][0] = renderer->loadBitmap("res/big2.png");
+        mCar[0][0] = renderer->loadBitmap("big0.png");
+        mCar[1][0] = renderer->loadBitmap("big1.png");
+        mCar[2][0] = renderer->loadBitmap("big2.png");
 
-        mCar[0][1] = renderer->loadBitmap("res/med0.png");
-        mCar[1][1] = renderer->loadBitmap("res/med1.png");
-        mCar[2][1] = renderer->loadBitmap("res/med2.png");
+        mCar[0][1] = renderer->loadBitmap("med0.png");
+        mCar[1][1] = renderer->loadBitmap("med1.png");
+        mCar[2][1] = renderer->loadBitmap("med2.png");
 
-        mCar[0][2] = renderer->loadBitmap("res/small0.png");
-        mCar[1][2] = renderer->loadBitmap("res/small1.png");
-        mCar[2][2] = renderer->loadBitmap("res/small2.png");
+        mCar[0][2] = renderer->loadBitmap("small0.png");
+        mCar[1][2] = renderer->loadBitmap("small1.png");
+        mCar[2][2] = renderer->loadBitmap("small2.png");
 
-        mOtherCar[0][0] = renderer->loadBitmap("res/obig0.png");
-        mOtherCar[1][0] = renderer->loadBitmap("res/obig1.png");
-        mOtherCar[2][0] = renderer->loadBitmap("res/obig2.png");
+        mOtherCar[0][0] = renderer->loadBitmap("obig0.png");
+        mOtherCar[1][0] = renderer->loadBitmap("obig1.png");
+        mOtherCar[2][0] = renderer->loadBitmap("obig2.png");
 
-        mOtherCar[0][1] = renderer->loadBitmap("res/omed0.png");
-        mOtherCar[1][1] = renderer->loadBitmap("res/omed1.png");
-        mOtherCar[2][1] = renderer->loadBitmap("res/omed2.png");
+        mOtherCar[0][1] = renderer->loadBitmap("omed0.png");
+        mOtherCar[1][1] = renderer->loadBitmap("omed1.png");
+        mOtherCar[2][1] = renderer->loadBitmap("omed2.png");
 
-        mOtherCar[0][2] = renderer->loadBitmap("res/osmall0.png");
-        mOtherCar[1][2] = renderer->loadBitmap("res/osmall1.png");
-        mOtherCar[2][2] = renderer->loadBitmap("res/osmall2.png");
+        mOtherCar[0][2] = renderer->loadBitmap("osmall0.png");
+        mOtherCar[1][2] = renderer->loadBitmap("osmall1.png");
+        mOtherCar[2][2] = renderer->loadBitmap("osmall2.png");
 
 
-        mSmoke = renderer->loadBitmap("res/smoke.png");
+        mSmoke = renderer->loadBitmap("smoke.png");
 
-        mHitSound = renderer->loadSound("res/hit.wav");
-        mBrakeSound = renderer->loadSound("res/brake.wav");
-        mAccelerateSound = renderer->loadSound("res/accel.wav");
+        mHitSound = renderer->loadSound("hit.wav");
+        mBrakeSound = renderer->loadSound("brake.wav");
+        mAccelerateSound = renderer->loadSound("accel.wav");
 
-        mUIFont = renderer->loadFont("res/albaregular.ttf", 15);
+        mUIFont = renderer->loadFont("albaregular.ttf", 15);
     }
 
     void CGameplayView::drawTextAt(std::pair<int, int> position, std::string text) {
@@ -96,7 +126,7 @@ namespace RunTheWorld {
         int shapeDelta = 0;
         char shape = game->track[game->elementIndex];
         char slope = game->slopes[game->elementIndex];
-        Vec3 camera = Vec3( FixP{(game->x) / (640 * 2)}, halfPart, FixP{(game->carSpeed / 500)});
+        Vec3 camera = Vec3( FixP{(game->x) / (xRes * 2)}, halfPart, FixP{(game->carSpeed / 500)});
 
         if (shape == ')') {
             shapeDelta = -1;
@@ -106,7 +136,7 @@ namespace RunTheWorld {
             shapeDelta = 1;
         }
 
-        float slopeDelta = 0;
+        int slopeDelta = 0;
 
         if (slope == '/') {
             slopeDelta = 1;
@@ -124,26 +154,25 @@ namespace RunTheWorld {
             distanceToCurrentShape = (game->distanceToNextElement);
         }
 
-        int halfScreenHeight = 480 / 2;
+        int halfScreenHeight = yRes / 2;
 
-        float slopeAddedLines = (2 * CLevel::kSlopeHeightInMeters *
-                                (distanceToCurrentShape / static_cast<float>(CLevel::kSegmentLengthInMeters)) *
-                                slopeDelta);
+        int slopeAddedLines = ( (2 * CLevel::kSlopeHeightInMeters * slopeDelta * distanceToCurrentShape) / (CLevel::kSegmentLengthInMeters) );
 
-//        int modulus = static_cast<int>(game->mHeading * 640) % 640;
-//
-//        while (modulus < 0) {
-//            modulus += 640;
-//        }
+        int modulus = static_cast<int>(game->mHeading * xRes) % xRes;
 
+        while (modulus < 0) {
+            modulus += xRes;
+        }
+
+        modulus = 0;
 
         int shadingStripesCount = 0;
 
 
-//        drawBackdropForHeading( modulus, game->zone );
+        drawBackdropForHeading( modulus, game->zone );
 
-        renderer->drawSquare(0, halfScreenHeight - slopeAddedLines, 640, 480, {0, 64, 0, 255});
-        renderer->drawSquare(0, 0, 640, halfScreenHeight - slopeAddedLines, {0, 0, 0, 255});
+        renderer->drawSquare(0, halfScreenHeight - slopeAddedLines, xRes, yRes, {0, 64, 0, 255});
+//        renderer->drawSquare(0, 0, xRes, halfScreenHeight - slopeAddedLines, {0, 0, 0, 255});
 
 
         Vec2 previousLeft(-1, -1);
@@ -151,25 +180,23 @@ namespace RunTheWorld {
 
         shadingStripesCount = 0;
 
-        float segmentLength = static_cast<float>(CLevel::kSegmentLengthInMeters);
+        int segmentLength = (CLevel::kSegmentLengthInMeters);
 
-        auto initialSlope = CLevel::kSlopeHeightInMeters *
-                             (distanceToCurrentShape / segmentLength ) * slopeDelta;
 
-        float currentStripeHeight = initialSlope;
-        float stripeHeightDelta = (-initialSlope) / 480;
+        float initialSlope = getInitialSlope(slopeDelta, distanceToCurrentShape, segmentLength);
 
-        for (int y = halfScreenHeight; y > -1; y--) {
+        float currentStripeHeight;
+        float stripeHeightDelta = (-initialSlope) / yRes;
 
-            if ( ++shadingStripesCount > 1024 ) {
-                shadingStripesCount = 0;
+        for (int y = 0; y < halfScreenHeight; ++y) {
+
+            if ( --shadingStripesCount <= 0 ) {
+                shadingStripesCount = 1024;
             }
 
             currentStripeHeight = initialSlope + ((2 * (halfScreenHeight - y)) * stripeHeightDelta);
 
-            float curve =
-                    (distanceToCurrentShape / static_cast<float>(CLevel::kSegmentLengthInMeters)) * shapeDelta * y * y /
-                    completelyArbitraryCurveEasingFactor;
+            float curve = getCurve(completelyArbitraryCurveEasingFactor, shapeDelta, distanceToCurrentShape, y);
 
             Vec2 leftPoint = project(Vec3(FixP{curve} - one, -one + FixP{currentStripeHeight}, FixP{-y}), camera);
             Vec2 rightPoint = project(Vec3(FixP{curve} + one, -one + FixP{currentStripeHeight}, FixP{-y}), camera);
@@ -184,19 +211,29 @@ namespace RunTheWorld {
 
             int shade = ((count + 16) * 256) / 32;
 
-            renderer->fill(leftPoint.x, rightPoint.x, leftPoint.y, previousLeft.x, previousRight.x, previousLeft.y,
-                           {shade, shade, shade, 255});
+            int diff = std::abs(static_cast<int>(leftPoint.y) - static_cast<int>(previousLeft.y) );
+            if ( diff < 2) {
+                renderer->drawSquare(
+                                        static_cast<int>(leftPoint.x),
+                                        static_cast<int>(leftPoint.y),
+                                      static_cast<int>(rightPoint.x),
+                                      static_cast<int>(leftPoint.y) + diff,
+                               {shade, shade, shade, 255});
+            } else {
+                renderer->fill(
+                               static_cast<int>(previousLeft.x),
+                               static_cast<int>(previousRight.x),
+                               static_cast<int>(previousLeft.y),
+                               static_cast<int>(leftPoint.x),
+                               static_cast<int>(rightPoint.x),
+                               static_cast<int>(leftPoint.y),
+                               {shade, shade, shade, 255});
+
+            }
 
             previousLeft = leftPoint;
             previousRight = rightPoint;
         }
-
-        initialSlope = CLevel::kSlopeHeightInMeters *
-                       (distanceToCurrentShape / static_cast<float>(CLevel::kSegmentLengthInMeters)) * slopeDelta;
-
-        stripeHeightDelta = (-initialSlope) / 480;
-
-        float playerLane = (game->x) / 640;
 
         for (auto foe : game->mCars) {
 
@@ -206,9 +243,7 @@ namespace RunTheWorld {
                 continue;
             }
 
-            float curve =
-                    (distanceToCurrentShape / static_cast<float>(CLevel::kSegmentLengthInMeters)) * shapeDelta * y * y /
-                    completelyArbitraryCurveEasingFactor;
+            float curve = getCurve(completelyArbitraryCurveEasingFactor, shapeDelta, distanceToCurrentShape, y);
 
             int lane = std::get<1>(foe);
             auto curveAndLane = FixP{lane} + FixP{curve};
@@ -263,7 +298,7 @@ namespace RunTheWorld {
 
 
         {
-            auto lane = FixP{game->x} / FixP{640};
+            auto lane = FixP{game->x} / FixP{xRes};
 
             auto fixCurrentStripeHeight = FixP{ initialSlope + ((2 * (halfScreenHeight - 4)) * stripeHeightDelta) };
             Vec2 carProjection2 = project(Vec3(lane - halfPart, -one + fixCurrentStripeHeight, -two - one), camera);
@@ -308,6 +343,17 @@ namespace RunTheWorld {
         }
     }
 
+    float CGameplayView::getInitialSlope(int slopeDelta, int distanceToCurrentShape, int segmentLength) const {
+        int part1 = 128 * (CLevel::kSlopeHeightInMeters * distanceToCurrentShape * slopeDelta);
+        int part2 = segmentLength;
+        auto initialSlope = ( part1 / part2 ) / 128.0f ;
+        return initialSlope;
+    }
+
+    float CGameplayView::getCurve(int completelyArbitraryCurveEasingFactor, int shapeDelta, int distanceToCurrentShape, int y) const {
+        return (128 * (distanceToCurrentShape * shapeDelta * y * y )) / (completelyArbitraryCurveEasingFactor * CLevel::kSegmentLengthInMeters) / 128.0f;
+    }
+
     void CGameplayView::onClick(std::pair<int, int> position) {
         if (position.first > 420) {
             this->mGameSession->getLevel()->onKeyDown(Vipper::ECommand::kRight);
@@ -315,7 +361,7 @@ namespace RunTheWorld {
             this->mGameSession->getLevel()->onKeyDown(Vipper::ECommand::kLeft);
         }
 
-        if (position.second > 320) {
+        if (position.second > xHalfRes) {
             this->mGameSession->getLevel()->onKeyDown(Vipper::ECommand::kDown);
         } else if (position.second < 160) {
             this->mGameSession->getLevel()->onKeyDown(Vipper::ECommand::kUp);

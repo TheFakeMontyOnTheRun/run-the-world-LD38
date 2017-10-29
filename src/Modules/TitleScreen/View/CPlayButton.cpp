@@ -6,7 +6,7 @@
 
 namespace RunTheWorld {
     CPlayButton::CPlayButton( std::shared_ptr<Vipper::IRenderer> renderer, CRect area, std::string label, std::function<void()> onClick ):
-    IView( renderer ), mBounds( area ), mLabel( label ), mOnClick( onClick ), mLabelFont( renderer->loadFont( "./res/albaregular.ttf", 15 ) ) {
+    IView( renderer ), mBounds( area ), mLabel( label ), mOnClick( onClick ), mLabelFont( renderer->loadFont( "albaregular.ttf", 15 ) ) {
     }
 
     bool CPlayButton::click( std::pair<int,int> position ) {
