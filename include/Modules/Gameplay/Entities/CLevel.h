@@ -16,8 +16,8 @@ namespace RunTheWorld {
 
         EGameState gameState = EGameState::kTitleScreen;
 
-        static const int kSegmentLengthInMeters = 1000;
-        static const int kSlopeHeightInMeters = 100;
+        static const int kSegmentLengthInMeters = 1024;
+        static const int kSlopeHeightInMeters = 128;
         static const int kZones = 3;
         bool smoking = false;
         float x = 0;

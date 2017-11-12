@@ -169,11 +169,13 @@ namespace RunTheWorld {
         int shadingStripesCount = 0;
 
 
-        drawBackdropForHeading( modulus, game->zone );
+        if (mDrawBackdrop) {
+            drawBackdropForHeading( modulus, game->zone );
+        } else {
+            renderer->drawSquare(0, 0, xRes, halfScreenHeight - slopeAddedLines, {0, 0, 0, 255});
+        }
 
         renderer->drawSquare(0, halfScreenHeight - slopeAddedLines, xRes, yRes, {0, 64, 0, 255});
-//        renderer->drawSquare(0, 0, xRes, halfScreenHeight - slopeAddedLines, {0, 0, 0, 255});
-
 
         Vec2 previousLeft(-1, -1);
         Vec2 previousRight(-1, -1);
@@ -185,7 +187,7 @@ namespace RunTheWorld {
 
         float initialSlope = static_cast<float>(getInitialSlope(slopeDelta, distanceToCurrentShape, segmentLength));
 
-        float currentStripeHeight;
+
         float stripeHeightDelta = (-initialSlope) / yRes;
 
         for (int y = 0; y < halfScreenHeight; ++y) {
@@ -194,7 +196,7 @@ namespace RunTheWorld {
                 shadingStripesCount = 1024;
             }
 
-            currentStripeHeight = initialSlope + ((2 * (halfScreenHeight - y)) * stripeHeightDelta);
+            auto currentStripeHeight = initialSlope + ((2 * (halfScreenHeight - y)) * stripeHeightDelta);
 
             float curve = getCurve(completelyArbitraryCurveEasingFactor, shapeDelta, distanceToCurrentShape, y);
 

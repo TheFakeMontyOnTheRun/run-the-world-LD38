@@ -36,6 +36,7 @@ namespace RunTheWorld {
     Vipper::IRenderer::FontId mUIFont;
 
   public:
+      bool mDrawBackdrop = true;
     explicit CGameplayView(std::shared_ptr<CGameSession> session, std::shared_ptr<Vipper::IRenderer> renderer);
     void drawTextAt( std::pair<int, int> position, std::string text );
     void drawGaugeAt( std::pair<int, int> position, int howFilled);
