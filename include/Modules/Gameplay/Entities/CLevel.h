@@ -25,7 +25,8 @@ namespace RunTheWorld {
         float mHeading = 0;
         int carSpeed = 0;
         int zone = 2;
-        long timeLeft = 90000;
+        long timeLeft = 100000;
+        long totalTimeForRound = 100000;
         //20 seconds per segment is quite fair
         std::array<char, 3>  track =   {{'(' , ')', ')'}};
         std::array<char, 3>  slopes = {{'/' , '\\', '_' }};

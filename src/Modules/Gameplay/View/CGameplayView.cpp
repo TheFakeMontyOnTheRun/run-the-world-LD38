@@ -355,6 +355,9 @@ namespace RunTheWorld {
             renderer->playSound(mAccelerateSound);
             game->accel = false;
         }
+
+        auto barWidth = ( xRes * this->mGameSession->getLevel()->timeLeft ) / this->mGameSession->getLevel()->totalTimeForRound;
+        renderer->drawSquare(0, 0, barWidth, 16, {255, 0, 0, 0 } );
     }
 
     float CGameplayView::getInitialSlope(int slopeDelta, int distanceToCurrentShape, int segmentLength) const {

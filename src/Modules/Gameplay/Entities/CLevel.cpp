@@ -91,7 +91,8 @@ namespace RunTheWorld {
         if ( elementIndex >= track.size() ) {
             elementIndex = 0;
             zone = (zone + 1) % kZones;
-            timeLeft += track.size() * 30 * 1000;
+            totalTimeForRound = timeLeft + track.size() * 45 * 1000;
+            timeLeft = totalTimeForRound;
         }
 
         if ( carSpeed > 0 ) {

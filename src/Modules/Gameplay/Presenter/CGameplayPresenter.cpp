@@ -46,6 +46,8 @@ namespace RunTheWorld {
       std::stringstream ss;
       ss << " Time left: ";
       ss << static_cast<long>(mGameSession->getLevel()->timeLeft / 1000 );
+      ss << "/";
+      ss << static_cast<long>(mGameSession->getLevel()->totalTimeForRound / 1000 );
       ss << " Zone: ";
       ss << names[mGameSession->getLevel()->zone];
 
