@@ -14,26 +14,26 @@
 
 namespace RunTheWorld {
         
-    Vipper::IRenderer::BitmapId CSDLRenderer::loadBitmap( std::string path ) {
+    Vipper::IRenderer::BitmapId CSDLRenderer::loadBitmap( const std::string& path ) {
       auto id = mSprites.size() + 1;
       mSprites[ id ] = IMG_Load( ( "resSDL/" + path).c_str() );
       return id;
     }
     
-    Vipper::IRenderer::SoundId CSDLRenderer::loadSound( std::string path ) {
+    Vipper::IRenderer::SoundId CSDLRenderer::loadSound( const std::string& path ) {
       auto id = mSounds.size() + 1;
       mSounds[ id ] = Mix_LoadWAV( ("resSDL/" + path).c_str() );
       return id;
     }
     
-    Vipper::IRenderer::FontId CSDLRenderer::loadFont( std::string path, int sizeInPt ) {
+    Vipper::IRenderer::FontId CSDLRenderer::loadFont( const std::string& path, int sizeInPt ) {
       auto id = mFonts.size() + 1;
       mFonts[ id ] = TTF_OpenFont(("resSDL/" + path).c_str(), sizeInPt );
 
       return id;
     }
 
-    void CSDLRenderer::fill(int x0, int x1, int y0, int x2, int x3, int y1, std::array<int,4> shade) {
+    void CSDLRenderer::fill(int x0, int x1, int y0, int x2, int x3, int y1, const std::array<int,4>& shade) {
         float fromY = std::min( y0, y1 );
         float toY = std::max( y0, y1 );
         SDL_Rect rect;
@@ -64,7 +64,7 @@ namespace RunTheWorld {
         }
     }
 
-    void CSDLRenderer::drawSquare( int x, int y, int x2, int y2, std::array<int,4> colour ) {
+    void CSDLRenderer::drawSquare( int x, int y, int x2, int y2, const std::array<int,4>& colour ) {
       SDL_Rect rect;
       rect.x = x;
       rect.y = y;
@@ -74,7 +74,7 @@ namespace RunTheWorld {
       SDL_FillRect( video, &rect, colourMerged );
     };
     
-    void CSDLRenderer::drawTextAt( int x, int y, std::string text, std::array<int, 4> colour, Vipper::IRenderer::FontId id ) {
+    void CSDLRenderer::drawTextAt( int x, int y, const std::string& text, const std::array<int, 4>& colour, const Vipper::IRenderer::FontId& id ) {
       if ( id == 0 ) {
         return;
       }
@@ -91,7 +91,7 @@ namespace RunTheWorld {
       SDL_FreeSurface( result );
     };
 
-    void CSDLRenderer::drawBitmapAt( int x, int y, int w, int h, const IRenderer::BitmapId id ) {
+    void CSDLRenderer::drawBitmapAt( int x, int y, int w, int h, const IRenderer::BitmapId& id ) {
 
       if ( id == 0 ) {
         return;

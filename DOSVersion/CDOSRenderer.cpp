@@ -96,7 +96,7 @@ namespace RunTheWorld {
         return toReturn;
     }
 
-    Vipper::IRenderer::BitmapId CDOSRenderer::loadBitmap(std::string path) {
+    Vipper::IRenderer::BitmapId CDOSRenderer::loadBitmap(const std::string& path) {
 
 
         auto id = 1;
@@ -149,15 +149,15 @@ namespace RunTheWorld {
         return id;
     }
 
-    Vipper::IRenderer::SoundId CDOSRenderer::loadSound(std::string path) {
+    Vipper::IRenderer::SoundId CDOSRenderer::loadSound(const std::string& path) {
         return 0;
     }
 
-    Vipper::IRenderer::FontId CDOSRenderer::loadFont(std::string path, int sizeInPt) {
+    Vipper::IRenderer::FontId CDOSRenderer::loadFont(const std::string& path, int sizeInPt) {
         return 0;
     }
 
-    void CDOSRenderer::fill(int x0, int x1, int y0, int x2, int x3, int y1, std::array<int, 4> colour) {
+    void CDOSRenderer::fill(int x0, int x1, int y0, int x2, int x3, int y1, const std::array<int, 4>& colour) {
 
         int fromY = std::min(y0, y1);
         int toY = std::max(y0, y1);
@@ -195,7 +195,7 @@ namespace RunTheWorld {
         }
     }
 
-    void CDOSRenderer::drawSquare(int x1, int y1, int x2, int y2, std::array<int, 4> colour) {
+    void CDOSRenderer::drawSquare(int x1, int y1, int x2, int y2, const std::array<int, 4>& colour) {
         int _x0 = std::min(319, std::max(0, x1 ));
         int _x1 = std::min(319, std::max(0, x2 ));
         int _y0 = std::min(199, std::max(0, y1 ));
@@ -216,10 +216,10 @@ namespace RunTheWorld {
     };
 
     void
-    CDOSRenderer::drawTextAt(int x, int y, std::string text, std::array<int, 4> colour, Vipper::IRenderer::FontId id) {
+    CDOSRenderer::drawTextAt(int x, int y, const std::string& text, const std::array<int, 4>& colour, const Vipper::IRenderer::FontId& id) {
     };
 
-    void CDOSRenderer::drawBitmapAt(int dx, int dy, int w, int h, const IRenderer::BitmapId id) {
+    void CDOSRenderer::drawBitmapAt(int dx, int dy, int w, int h, const IRenderer::BitmapId& id) {
         auto bitmap = mSprites[id - 1];
         auto data = bitmap->getPixelData();
 

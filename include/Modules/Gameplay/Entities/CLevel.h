@@ -45,8 +45,8 @@ namespace RunTheWorld {
 
         std::vector<CCar> getCarsAhead( int range ) const;
 
-        void onKeyUp( Vipper::ECommand keyCode );
-        void onKeyDown( Vipper::ECommand keyCode );
+        void onKeyUp( const Vipper::ECommand& keyCode );
+        void onKeyDown( const Vipper::ECommand& keyCode );
         bool isOver();
         bool mIsOver = false;
         bool hit = false;

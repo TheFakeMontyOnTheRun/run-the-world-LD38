@@ -14,14 +14,14 @@ namespace RunTheWorld {
     void render() override;
     void shutdown() override;
     void update() override;        
-    BitmapId loadBitmap( std::string path ) override;
-    SoundId loadSound( std::string path ) override;
-    FontId loadFont( std::string path, int sizeInPt ) override;
-    void drawSquare( int x, int y, int x2, int y2, std::array<int,4> colour ) override;
-    void drawTextAt( int x, int y, std::string text, std::array<int, 4> colour, FontId font ) override;
-    void drawBitmapAt( int x, int y, int w, int h, const BitmapId id ) override;
+    BitmapId loadBitmap( const std::string& path ) override;
+    SoundId loadSound( const std::string& path ) override;
+    FontId loadFont( const std::string& path, int sizeInPt ) override;
+    void drawSquare( int x, int y, int x2, int y2, const std::array<int,4>& colour ) override;
+    void drawTextAt( int x, int y, const std::string& text, const std::array<int, 4>& colour, const FontId& font ) override;
+    void drawBitmapAt( int x, int y, int w, int h, const BitmapId& id ) override;
     void playSound( const SoundId& id ) override;
-    void fill(int x0, int x1, int y0, int x2, int x3, int y1, std::array<int,4> shade) override;
+    void fill(int x0, int x1, int y0, int x2, int x3, int y1, const std::array<int,4>& shade) override;
   };
 }
 #endif

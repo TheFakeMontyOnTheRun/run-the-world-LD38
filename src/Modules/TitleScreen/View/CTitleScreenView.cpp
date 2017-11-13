@@ -38,7 +38,7 @@ namespace RunTheWorld {
 #endif
 	}
 
-	void CTitleScreenView::onClick( std::pair<int, int> position ) {
+	void CTitleScreenView::onClick( const std::pair<int, int>& position ) {
 #ifdef __EMSCRIPTEN__
         getRenderer()->playSound(mSelectedSound);
         std::dynamic_pointer_cast<CTitleScreenPresenter>(getPresenter())->onClickOnPlayButton();
@@ -49,11 +49,11 @@ namespace RunTheWorld {
 #endif
 	}
 
-    void CTitleScreenView::onKeyUp( Vipper::ECommand keyCode ) {
+    void CTitleScreenView::onKeyUp( const Vipper::ECommand& keyCode ) {
         mButton->activate();
         getRenderer()->playSound(mSelectedSound);
     }
 
-    void CTitleScreenView::onKeyDown( Vipper::ECommand keyCode ) {
+    void CTitleScreenView::onKeyDown( const Vipper::ECommand& keyCode ) {
     }
 }

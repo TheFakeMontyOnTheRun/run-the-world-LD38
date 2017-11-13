@@ -127,7 +127,7 @@ namespace RunTheWorld {
         return mIsOver;
     }
 
-    void CLevel::onKeyUp( Vipper::ECommand command ) {
+    void CLevel::onKeyUp( const Vipper::ECommand& command ) {
 
         if (command == Vipper::ECommand::kLeft) {
         }
@@ -148,7 +148,7 @@ namespace RunTheWorld {
         return;
     }
 
-    void CLevel::onKeyDown( Vipper::ECommand command ) {
+    void CLevel::onKeyDown( const Vipper::ECommand& command ) {
         if (command == Vipper::ECommand::kLeft) {
             xSpeed = -1;
 

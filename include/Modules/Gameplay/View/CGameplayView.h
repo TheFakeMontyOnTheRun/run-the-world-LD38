@@ -42,9 +42,9 @@ namespace RunTheWorld {
     void drawGaugeAt( std::pair<int, int> position, int howFilled);
     std::pair<int, int> getLastClick();
     void show() override;
-    void onClick( std::pair< int, int> position ) override;
-    void onKeyUp( Vipper::ECommand keyCode ) override;
-      void onKeyDown( Vipper::ECommand keyCode ) override;
+    void onClick( const std::pair< int, int>& position ) override;
+    void onKeyUp( const Vipper::ECommand& keyCode ) override;
+      void onKeyDown( const Vipper::ECommand& keyCode ) override;
       void drawBackdropForHeading(int modulus, int zone  );
 
       float getCurve(int completelyArbitraryCurveEasingFactor, int shapeDelta, int distanceToCurrentShape, int y) const;

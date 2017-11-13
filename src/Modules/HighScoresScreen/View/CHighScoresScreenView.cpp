@@ -38,16 +38,16 @@ namespace RunTheWorld {
 #endif
 	}
 	
-	void CHighScoresScreenView::onClick( std::pair<int, int> position ) {
+	void CHighScoresScreenView::onClick( const std::pair<int, int>& position ) {
 		std::dynamic_pointer_cast<CHighScoresScreenPresenter>(getPresenter())->onClickOnOkButton();
 	}
 
-    void CHighScoresScreenView::onKeyUp( Vipper::ECommand keyCode ) {
+    void CHighScoresScreenView::onKeyUp( const Vipper::ECommand& keyCode ) {
         if ( keyCode == Vipper::ECommand::kFire1 ) {
             std::dynamic_pointer_cast<CHighScoresScreenPresenter>(getPresenter())->onClickOnOkButton();
         }
     }
 
-    void CHighScoresScreenView::onKeyDown( Vipper::ECommand keyCode ) {
+    void CHighScoresScreenView::onKeyDown( const Vipper::ECommand& keyCode ) {
     }
 }

@@ -355,7 +355,7 @@ namespace RunTheWorld {
         return (128 * (distanceToCurrentShape * shapeDelta * y * y )) / (completelyArbitraryCurveEasingFactor * CLevel::kSegmentLengthInMeters) / 128.0f;
     }
 
-    void CGameplayView::onClick(std::pair<int, int> position) {
+    void CGameplayView::onClick(const std::pair<int, int>& position) {
         if (position.first > 420) {
             this->mGameSession->getLevel()->onKeyDown(Vipper::ECommand::kRight);
         } else if (position.first < 210) {
@@ -369,11 +369,11 @@ namespace RunTheWorld {
         }
     }
 
-    void CGameplayView::onKeyUp(Vipper::ECommand keyCode) {
+    void CGameplayView::onKeyUp(const Vipper::ECommand& keyCode) {
         this->mGameSession->getLevel()->onKeyUp(keyCode);
     }
 
-    void CGameplayView::onKeyDown(Vipper::ECommand keyCode) {
+    void CGameplayView::onKeyDown(const Vipper::ECommand& keyCode) {
         this->mGameSession->getLevel()->onKeyDown(keyCode);
     }
 }
