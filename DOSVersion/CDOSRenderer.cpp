@@ -239,12 +239,17 @@ namespace RunTheWorld {
             auto line = std::begin( mBuffer ) + (320 * y);
             auto sourceLine = data + (sy * width);
 
+            y = (sy + dy);
+
+            if ( y < 0 || y >= 200) {
+                continue;
+            }
+
             for (int sx = 0; sx < width; ++sx) {
 
                 x = (sx + dx);
-                y = (sy + dy);
 
-                if (x < 0 || x >= 320 || y < 0 || y >= 200) {
+                if (x < 0 || x >= 320 ) {
                     continue;
                 }
 
@@ -362,8 +367,5 @@ namespace RunTheWorld {
 
         mFrame++;
         dosmemput(mFinalBuffer, 64000, 0xa0000);
-        gotoxy(1, 1);
-        printf("%d", mFrame);
-
     }
 }
