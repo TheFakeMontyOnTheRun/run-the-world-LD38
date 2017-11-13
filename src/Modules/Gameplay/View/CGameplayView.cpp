@@ -217,7 +217,7 @@ namespace RunTheWorld {
                 previousRight = rightPoint;
             }
 
-            int count = (-shadingStripesCount + static_cast<long>(game->distanceRan)) % numberOfStripeShades;
+            int count = (-shadingStripesCount + (static_cast<long>(game->distanceRan) % ( CLevel::kSegmentLengthInMeters / 2 )  )) % numberOfStripeShades;
 
             int shade = ((count + 16) * 256) / 32;
 
