@@ -51,7 +51,7 @@ namespace RunTheWorld {
 
       float getCurve(int completelyArbitraryCurveEasingFactor, int shapeDelta, int distanceToCurrentShape, int y) const;
 
-      FixP getInitialSlope(int slopeDelta, int distanceToCurrentShape, int segmentLength) const;
+      float getInitialSlope(int slopeDelta, int distanceToCurrentShape, int segmentLength) const;
   };
 }
 #endif

@@ -193,7 +193,7 @@ namespace RunTheWorld {
         int segmentLength = (CLevel::kSegmentLengthInMeters);
 
 
-        float initialSlope = static_cast<float>(getInitialSlope(slopeDelta, distanceToCurrentShape, segmentLength));
+        float initialSlope = getInitialSlope(slopeDelta, distanceToCurrentShape, segmentLength);
 
 
         float stripeHeightDelta = (-initialSlope) / yRes;
@@ -356,10 +356,8 @@ namespace RunTheWorld {
         }
     }
 
-    FixP CGameplayView::getInitialSlope(int slopeDelta, int distanceToCurrentShape, int segmentLength) const {
-        FixP part1{CLevel::kSlopeHeightInMeters * distanceToCurrentShape * slopeDelta};
-        FixP part2{segmentLength};
-        return ( part1 / part2 );
+    float CGameplayView::getInitialSlope(int slopeDelta, int distanceToCurrentShape, int segmentLength) const {
+        return ( CLevel::kSlopeHeightInMeters * distanceToCurrentShape * slopeDelta / segmentLength );
     }
 
     float CGameplayView::getCurve(int completelyArbitraryCurveEasingFactor, int shapeDelta, int distanceToCurrentShape, int y) const {
