@@ -76,6 +76,14 @@ namespace RunTheWorld {
         mCar[1][2] = renderer->loadBitmap("small1.png");
         mCar[2][2] = renderer->loadBitmap("small2.png");
 
+        for ( int  direction = 0; direction < 3; ++direction ) {
+            for ( int distance = 0; distance < 3; ++distance ) {
+                auto sprite = renderer->getBitmapSize( mCar[ distance ][ direction ] );
+                mWidth[ distance ][ direction ] = sprite.first;
+                mHeight[ distance ][ direction ] = sprite.second;
+            }
+        }
+
         mOtherCar[0][0] = renderer->loadBitmap("obig0.png");
         mOtherCar[1][0] = renderer->loadBitmap("obig1.png");
         mOtherCar[2][0] = renderer->loadBitmap("obig2.png");
@@ -278,6 +286,9 @@ namespace RunTheWorld {
                 continue;
             }
 
+            sizeX = mWidth[ carSprite ][ carSize ];
+            sizeY = mHeight[ carSprite ][ carSize ];
+
 
             auto centerX = carProjection0.x + ((carProjection1.x - carProjection0.x) / two);
             auto centerY = carProjection0.y + ((carProjection2.y - carProjection0.y) / two);
@@ -321,10 +332,10 @@ namespace RunTheWorld {
 
             int carSprite = (static_cast<int>(lane) + 1) + 1;
 
-            renderer->drawBitmapAt(static_cast<int>(centerX) - 64, static_cast<int>(centerY) - 32, 128, 32, mCar[carSprite][0]);
+            renderer->drawBitmapAt(static_cast<int>(centerX) - (mWidth[ carSprite ][ 0 ] / 2), static_cast<int>(centerY) - (mHeight[ carSprite ][ 0 ] / 2), 128, 32, mCar[carSprite][0]);
 
             if (game->smoking) {
-                renderer->drawBitmapAt(static_cast<int>(centerX) - 64, static_cast<int>(centerY), 100, 33, mSmoke);
+                renderer->drawBitmapAt(static_cast<int>(centerX) - (mWidth[ carSprite ][ 0 ] / 2), static_cast<int>(centerY), 100, 33, mSmoke);
             }
         }
 

@@ -215,6 +215,12 @@ namespace RunTheWorld {
         }
     };
 
+    std::pair<int, int> CDOSRenderer::getBitmapSize( const BitmapId& id ) {
+        auto sprite = mSprites[ id - 1];
+
+        return { sprite->getWidth(), sprite->getHeight() };
+    };
+
     void
     CDOSRenderer::drawTextAt(int x, int y, const std::string& text, const std::array<int, 4>& colour, const Vipper::IRenderer::FontId& id) {
     };

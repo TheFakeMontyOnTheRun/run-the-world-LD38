@@ -33,6 +33,11 @@ namespace RunTheWorld {
       return id;
     }
 
+    std::pair<int, int> CSDLRenderer::getBitmapSize( const Vipper::IRenderer::BitmapId& id ) {
+        auto sprite = mSprites[ id ];
+        return { sprite->w, sprite->h };
+    }
+
     void CSDLRenderer::fill(int x0, int x1, int y0, int x2, int x3, int y1, const std::array<int,4>& shade) {
         float fromY = std::min( y0, y1 );
         float toY = std::max( y0, y1 );

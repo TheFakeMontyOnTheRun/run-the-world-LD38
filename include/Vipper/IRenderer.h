@@ -43,6 +43,7 @@ namespace Vipper {
 
         virtual void render() = 0;
 
+        virtual std::pair<int, int> getBitmapSize( const BitmapId& id ) = 0;
 
         virtual BitmapId loadBitmap(const std::string& path) = 0;
 

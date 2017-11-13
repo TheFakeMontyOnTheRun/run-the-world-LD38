@@ -16,6 +16,7 @@ namespace RunTheWorld {
     void update() override;        
     BitmapId loadBitmap( const std::string& path ) override;
     SoundId loadSound( const std::string& path ) override;
+    std::pair<int, int> getBitmapSize( const BitmapId& id ) override;
     FontId loadFont( const std::string& path, int sizeInPt ) override;
     void drawSquare( int x, int y, int x2, int y2, const std::array<int,4>& colour ) override;
     void drawTextAt( int x, int y, const std::string& text, const std::array<int, 4>& colour, const FontId& font ) override;
