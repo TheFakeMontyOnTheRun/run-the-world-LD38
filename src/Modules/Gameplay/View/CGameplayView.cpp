@@ -264,7 +264,8 @@ namespace RunTheWorld {
             Vec2 carProjection2 = project(Vec3(curveAndLane - halfPart, fixedStripeHeight, bottom - one), camera);
             Vec2 carProjection3 = project(Vec3(curveAndLane + halfPart, fixedStripeHeight, bottom - one), camera);
 
-            int carSprite = (lane + 1);
+            int carSprite = std::max( 0, std::min((static_cast<int>(lane) + 1), 2) );
+
             int carSize = 0;
 
             int sizeX = 32;
@@ -330,7 +331,7 @@ namespace RunTheWorld {
                            static_cast<int>(centerY),
                            {0, 0, 0, 0});
 
-            int carSprite = (static_cast<int>(lane) + 1);
+            int carSprite = std::max( 0, std::min((static_cast<int>(lane) + 1), 2) );
 
             renderer->drawBitmapAt(static_cast<int>(centerX) - (mWidth[ carSprite ][ 0 ] / 2), static_cast<int>(centerY) - (mHeight[ carSprite ][ 0 ] / 2), 128, 32, mCar[carSprite][0]);
 
