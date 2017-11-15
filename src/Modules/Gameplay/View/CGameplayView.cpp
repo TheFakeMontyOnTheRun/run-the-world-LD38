@@ -122,7 +122,12 @@ namespace RunTheWorld {
 
         auto renderer = getRenderer();
 
-        auto halfPart = FixP{2} / FixP{10};
+        auto halfPart = mCameraHeight / FixP{10};
+
+        if ( mCameraHeight > FixP{2}) {
+            mCameraHeight -= mCameraHeightIncrements;
+        }
+
         auto zero = FixP{0};
         auto one = FixP{1};
         auto two = FixP{2};

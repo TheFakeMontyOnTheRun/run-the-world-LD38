@@ -48,6 +48,8 @@ namespace RunTheWorld {
     void onKeyUp( const Vipper::ECommand& keyCode ) override;
       void onKeyDown( const Vipper::ECommand& keyCode ) override;
       void drawBackdropForHeading(int modulus, int zone  );
+      FixP mCameraHeight{ 10 };
+      FixP mCameraHeightIncrements{ 0.1f };
 
       float getCurve(int completelyArbitraryCurveEasingFactor, int shapeDelta, int distanceToCurrentShape, int y) const;
 
