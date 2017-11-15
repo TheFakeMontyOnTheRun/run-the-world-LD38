@@ -42,6 +42,7 @@ namespace RunTheWorld {
             240;
 #endif
 
+    const static bool kDrawShadows = false;
 
     Vec2 project(Vec3 v, Vec3 camera) {
         FixP one{1};
@@ -299,13 +300,15 @@ namespace RunTheWorld {
             auto centerX = carProjection0.x + ((carProjection1.x - carProjection0.x) / two);
             auto centerY = carProjection0.y + ((carProjection2.y - carProjection0.y) / two);
 
-            renderer->fill(static_cast<int>(carProjection0.x),
-                           static_cast<int>(carProjection1.x),
-                           static_cast<int>(carProjection0.y),
-                           static_cast<int>(carProjection2.x),
-                           static_cast<int>(carProjection3.x),
-                           static_cast<int>(centerY),
-                           {0, 0, 0, 0});
+            if ( kDrawShadows ) {
+                renderer->fill(static_cast<int>(carProjection0.x),
+                               static_cast<int>(carProjection1.x),
+                               static_cast<int>(carProjection0.y),
+                               static_cast<int>(carProjection2.x),
+                               static_cast<int>(carProjection3.x),
+                               static_cast<int>(centerY),
+                               {0, 0, 0, 0});
+            }
 
 
             renderer->drawBitmapAt(static_cast<int>(centerX) - (sizeX / 2),
@@ -328,13 +331,15 @@ namespace RunTheWorld {
             auto centerX = carProjection0.x + ((carProjection1.x - carProjection0.x) / two);
             auto centerY = carProjection0.y + ((carProjection2.y - carProjection0.y) / two);
 
-            renderer->fill(static_cast<int>(carProjection0.x),
-                           static_cast<int>(carProjection1.x),
-                           static_cast<int>(carProjection0.y),
-                           static_cast<int>(carProjection2.x),
-                           static_cast<int>(carProjection3.x),
-                           static_cast<int>(centerY),
-                           {0, 0, 0, 0});
+            if ( kDrawShadows ) {
+                renderer->fill(static_cast<int>(carProjection0.x),
+                               static_cast<int>(carProjection1.x),
+                               static_cast<int>(carProjection0.y),
+                               static_cast<int>(carProjection2.x),
+                               static_cast<int>(carProjection3.x),
+                               static_cast<int>(centerY),
+                               {0, 0, 0, 0});
+            }
 
             int carSprite = std::max( 0, std::min((static_cast<int>(lane) + 1), 2) );
 
