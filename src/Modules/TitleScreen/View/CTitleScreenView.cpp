@@ -1,3 +1,4 @@
+#include <functional>
 #include <string>
 #include <array>
 #include "Vipper/Vipper.h"
