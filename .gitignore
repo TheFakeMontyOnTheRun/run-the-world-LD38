@@ -34,3 +34,7 @@ game.wasm
 .idea
 cmake-build-debug
 CWSDPMI.SWP
+index.data
+index.html
+index.html.mem
+index.js
