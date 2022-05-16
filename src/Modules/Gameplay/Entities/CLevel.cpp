@@ -22,19 +22,19 @@ namespace RunTheWorld {
     }
 
     CLevel::CLevel() {
-        gameState = EGameState::kGame;
-        reset();
+		gameState = EGameState::kGame;
+		reset();
+		int maxPosition = track.size() * kSegmentLengthInMeters * kZones;
 
-        std::random_device rd;
-        std::mt19937 gen(rd());
+		for (int c = 0; c < 128; ++c) {
+			mCars.push_back(std::make_tuple(
 
-        std::uniform_real_distribution<> speedRandom(1, 50);
-        std::uniform_real_distribution<> laneRandom(-1, 1);
-        std::uniform_real_distribution<> positionRandom( 10, track.size() * kSegmentLengthInMeters * kZones);
+					(rand() % (maxPosition - 10) + 10),
+					(rand() % 3) - 2,
+					(rand() % 49) + 1
 
-        for( int c = 0; c < 128; ++c ) {
-            mCars.push_back( std::make_tuple( positionRandom( gen ), laneRandom( gen ), speedRandom( gen ) ) );
-        }
+			));
+		}
     }
 
     void CLevel::tick(long ms) {

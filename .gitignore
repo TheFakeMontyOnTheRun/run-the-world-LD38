@@ -31,3 +31,6 @@ game.data
 game.html
 game.js
 game.wasm
+.idea
+cmake-build-debug
+CWSDPMI.SWP
