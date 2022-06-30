@@ -110,9 +110,6 @@ namespace RunTheWorld {
 
         id = mSprites.size() + 1;
 
-        std::cout << ".";
-        std::cout.flush();
-
         auto buffer = loadBinaryFileFromPath("resDOS/" + path);
         int xSize;
         int ySize;
