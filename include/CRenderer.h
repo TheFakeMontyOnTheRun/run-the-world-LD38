@@ -26,13 +26,11 @@ namespace RunTheWorld {
         CControlCallback mOnKeyReleasedCallback;
      public:
         CRenderer( CControlCallback keyPressedCallback, CControlCallback keyReleasedCallback );
-        void render( const CGame& game, long ms );
-        void handleSystemEvents();
-        void sleep( long ms );
-
-        void fill(float x0, float x1, float y0, float x2, float x3, float y1, int color[3]);
-
-        void drawBackdropForHeading(int modulus, int zone);
+        virtual void render( const CGame& game, long ms );
+	virtual void handleSystemEvents();
+        virtual void sleep( long ms );
+        virtual void fill(float x0, float x1, float y0, float x2, float x3, float y1, std::array<int,4> color);
+        virtual void drawBackdropForHeading(int modulus, int zone);
     };
 }
 #endif

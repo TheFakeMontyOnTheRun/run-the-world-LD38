@@ -18,12 +18,12 @@
 namespace RunTheWorld {
 	CHighScoresScreenView::CHighScoresScreenView(std::shared_ptr<Vipper::IRenderer> renderer):
 	IView( renderer ){
-		mTitleTextFont = renderer->loadFont( "res/albasuper.ttf", 40 );
-		mInstructionsFont = renderer->loadFont( "res/albaregular.ttf", 15 );
+		mTitleTextFont = renderer->loadFont( "albasuper.ttf", 40 );
+		mInstructionsFont = renderer->loadFont( "albaregular.ttf", 15 );
 #ifdef __EMSCRIPTEN__
-		mBg = renderer->loadBitmap("res/emgameover.png");
+		mBg = renderer->loadBitmap("emgameover.png");
 #else
-	mBg = renderer->loadBitmap("res/bg.png");
+	mBg = renderer->loadBitmap("bg.png");
 #endif
 	}
 	
@@ -38,16 +38,16 @@ namespace RunTheWorld {
 #endif
 	}
 	
-	void CHighScoresScreenView::onClick( std::pair<int, int> position ) {
+	void CHighScoresScreenView::onClick( const std::pair<int, int>& position ) {
 		std::dynamic_pointer_cast<CHighScoresScreenPresenter>(getPresenter())->onClickOnOkButton();
 	}
 
-    void CHighScoresScreenView::onKeyUp( Vipper::ECommand keyCode ) {
+    void CHighScoresScreenView::onKeyUp( const Vipper::ECommand& keyCode ) {
         if ( keyCode == Vipper::ECommand::kFire1 ) {
             std::dynamic_pointer_cast<CHighScoresScreenPresenter>(getPresenter())->onClickOnOkButton();
         }
     }
 
-    void CHighScoresScreenView::onKeyDown( Vipper::ECommand keyCode ) {
+    void CHighScoresScreenView::onKeyDown( const Vipper::ECommand& keyCode ) {
     }
 }

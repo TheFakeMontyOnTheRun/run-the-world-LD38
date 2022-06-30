@@ -3,11 +3,8 @@
 #include <functional>
 #include <map>
 #include <set>
-#include <string>
-#include <functional>
 #include <algorithm>
 #include "Vipper/Vipper.h"
-#include <Modules/TitleScreen/View/CRect.h>
 
 #include "Modules/Gameplay/Entities/CLevel.h"
 #include "Modules/Gameplay/Entities/CGameSession.h"
@@ -15,273 +12,391 @@
 
 
 namespace RunTheWorld {
+    
+    const static auto xRes =
+#ifdef DOS
+            320;
+#else
+            640;
+#endif
+
+    const static auto xHalfRes =
+#ifdef DOS
+            160;
+#else
+            320;
+#endif
+
+
+    const static auto yRes =
+#ifdef DOS
+            200;
+#else
+            480;
+#endif
+
+    const static auto yHalfRes =
+#ifdef DOS
+            100;
+#else
+            240;
+#endif
+
+    const static bool kDrawShadows = false;
 
     Vec2 project(Vec3 v, Vec3 camera) {
-        float xz = (v.x - camera.x) / (1.0f - v.z + camera.z);
-        float yz = (v.y - camera.y) / (1.0f - v.z + camera.z);
+        FixP one{1};
+        auto xz = (v.x - camera.x) / (one - v.z + camera.z);
+        auto yz = (v.y - camera.y) / (one - v.z + camera.z);
 
-        Vec2 v2(320 + (xz * 640), 240 - (yz * 480));
+        Vec2 v2(FixP{xHalfRes} + (xz * FixP{xRes}), FixP{yHalfRes} - (yz * FixP{yRes}));
         return v2;
     }
 
-    void CGameplayView::drawBackdropForHeading(int modulus, int zone  ) {
-        getRenderer()->drawBitmapAt( -640 + modulus, 0, 640, 480, mBackdrop[ zone ] );
-        getRenderer()->drawBitmapAt( modulus, 0, 640, 480, mBackdrop[ zone ] );
+    void CGameplayView::drawBackdropForHeading(int modulus, int zone) {
+        getRenderer()->drawBitmapAt(-xRes + modulus, 0, xRes, yRes, mBackdrop[zone]);
+        getRenderer()->drawBitmapAt(modulus, 0, xRes, yRes, mBackdrop[zone]);
     }
 
-	CGameplayView::CGameplayView(std::shared_ptr<CGameSession> session, std::shared_ptr<Vipper::IRenderer> renderer) : IView( renderer ), mGameSession( session ) {
+    CGameplayView::CGameplayView(std::shared_ptr<CGameSession> session, std::shared_ptr<Vipper::IRenderer> renderer)
+            : IView(renderer), mGameSession(session) {
+
+        mBackdrop[0] = renderer->loadBitmap("3.png");
+        mBackdrop[1] = renderer->loadBitmap("2.png");
+        mBackdrop[2] = renderer->loadBitmap("1.png");
+
+        mCar[0][0] = renderer->loadBitmap("big0.png");
+        mCar[1][0] = renderer->loadBitmap("big1.png");
+        mCar[2][0] = renderer->loadBitmap("big2.png");
+
+        mCar[0][1] = renderer->loadBitmap("med0.png");
+        mCar[1][1] = renderer->loadBitmap("med1.png");
+        mCar[2][1] = renderer->loadBitmap("med2.png");
+
+        mCar[0][2] = renderer->loadBitmap("small0.png");
+        mCar[1][2] = renderer->loadBitmap("small1.png");
+        mCar[2][2] = renderer->loadBitmap("small2.png");
+
+        for ( int  direction = 0; direction < 3; ++direction ) {
+            for ( int distance = 0; distance < 3; ++distance ) {
+                auto sprite = renderer->getBitmapSize( mCar[ distance ][ direction ] );
+                mWidth[ distance ][ direction ] = sprite.first;
+                mHeight[ distance ][ direction ] = sprite.second;
+            }
+        }
+
+        mOtherCar[0][0] = renderer->loadBitmap("obig0.png");
+        mOtherCar[1][0] = renderer->loadBitmap("obig1.png");
+        mOtherCar[2][0] = renderer->loadBitmap("obig2.png");
+
+        mOtherCar[0][1] = renderer->loadBitmap("omed0.png");
+        mOtherCar[1][1] = renderer->loadBitmap("omed1.png");
+        mOtherCar[2][1] = renderer->loadBitmap("omed2.png");
+
+        mOtherCar[0][2] = renderer->loadBitmap("osmall0.png");
+        mOtherCar[1][2] = renderer->loadBitmap("osmall1.png");
+        mOtherCar[2][2] = renderer->loadBitmap("osmall2.png");
 
 
-        mBackdrop[0] = renderer->loadBitmap( "res/3.png" );
-        mBackdrop[1] = renderer->loadBitmap( "res/2.png" );
-        mBackdrop[2] = renderer->loadBitmap( "res/1.png" );
+        mSmoke = renderer->loadBitmap("smoke.png");
 
-        mCar[0][0] = renderer->loadBitmap( "res/big0.png" );
-        mCar[1][0] = renderer->loadBitmap( "res/big1.png" );
-        mCar[2][0] = renderer->loadBitmap( "res/big2.png" );
+        mHitSound = renderer->loadSound("hit.wav");
+        mBrakeSound = renderer->loadSound("brake.wav");
+        mAccelerateSound = renderer->loadSound("accel.wav");
 
-        mCar[0][1] = renderer->loadBitmap( "res/med0.png" );
-        mCar[1][1] = renderer->loadBitmap( "res/med1.png" );
-        mCar[2][1] = renderer->loadBitmap( "res/med2.png" );
+        mUIFont = renderer->loadFont("albaregular.ttf", 15);
+    }
 
-        mCar[0][2] = renderer->loadBitmap( "res/small0.png" );
-        mCar[1][2] = renderer->loadBitmap( "res/small1.png" );
-        mCar[2][2] = renderer->loadBitmap( "res/small2.png" );
+    void CGameplayView::drawTextAt(std::pair<int, int> position, std::string text) {
+        auto renderer = getRenderer();
+        renderer->drawTextAt(position.first, position.second, text, {0xFF, 0xFF, 0x00, 0xFF}, mUIFont);
+    }
 
-        mOtherCar[0][0] = renderer->loadBitmap( "res/obig0.png" );
-        mOtherCar[1][0] = renderer->loadBitmap( "res/obig1.png" );
-        mOtherCar[2][0] = renderer->loadBitmap( "res/obig2.png" );
+    void CGameplayView::drawGaugeAt(std::pair<int, int> position, int howFilled) {
+        auto renderer = getRenderer();
+        renderer->drawSquare(position.first, position.second, 100, position.second + 20, {0, 0, 255, 255});
+        renderer->drawSquare(position.first, position.second, howFilled, position.second + 20, {255, 0, 0, 255});
+    }
 
-        mOtherCar[0][1] = renderer->loadBitmap( "res/omed0.png" );
-        mOtherCar[1][1] = renderer->loadBitmap( "res/omed1.png" );
-        mOtherCar[2][1] = renderer->loadBitmap( "res/omed2.png" );
-
-        mOtherCar[0][2] = renderer->loadBitmap( "res/osmall0.png" );
-        mOtherCar[1][2] = renderer->loadBitmap( "res/osmall1.png" );
-        mOtherCar[2][2] = renderer->loadBitmap( "res/osmall2.png" );
-
-
-        mSmoke = renderer->loadBitmap( "res/smoke.png" );
-
-		mHitSound = renderer->loadSound( "res/hit.wav" );
-        mBrakeSound = renderer->loadSound( "res/brake.wav" );
-        mAccelerateSound = renderer->loadSound( "res/accel.wav" );
-
-        mUIFont = renderer->loadFont( "res/albaregular.ttf", 15 );
-	}
-	
-    void CGameplayView::drawTextAt( std::pair<int, int> position, std::string text ) {
-		auto renderer = getRenderer();
-		renderer->drawTextAt( position.first, position.second, text, {0xFF, 0xFF, 0x00, 0xFF }, mUIFont  );
-	}
-	
-    void CGameplayView::drawGaugeAt( std::pair<int, int> position, int howFilled) {
-		auto renderer = getRenderer();
-		renderer->drawSquare(position.first, position.second, 100, position.second + 20, {0,0,255,255});
-		renderer->drawSquare(position.first, position.second, howFilled, position.second + 20, {255,0,0,255});
-	}
-	
     void CGameplayView::show() {
         auto game = this->mGameSession->getLevel();
-        
-		auto renderer = getRenderer();
-		renderer->drawSquare( 0, 0, 640 - 64, 480, {0,0,0,255} );
+
+        auto renderer = getRenderer();
+
+        auto halfPart = mCameraHeight / FixP{10};
+
+        if ( mCameraHeight > FixP{2}) {
+            mCameraHeight -= mCameraHeightIncrements;
+        }
+
+        auto zero = FixP{0};
+        auto one = FixP{1};
+        auto two = FixP{2};
+        auto four = FixP{4};
+        auto misterious = two;
+
+        int numberOfStripeShades = 4;
+        int completelyArbitraryCurveEasingFactor = 128;
+        int shapeDelta = 0;
+        char shape = game->track[game->elementIndex];
+        char slope = game->slopes[game->elementIndex];
+        Vec3 camera = Vec3( FixP{(game->x) / (xRes * 2)}, halfPart, FixP{(game->carSpeed / 500)});
+
+        if (shape == ')') {
+            shapeDelta = -1;
+        }
+
+        if (shape == '(') {
+            shapeDelta = 1;
+        }
+
+        int slopeDelta = 0;
+
+        if (slope == '/') {
+            slopeDelta = 1;
+        }
+
+        if (slope == '\\') {
+            slopeDelta = -1;
+        }
+
+        int distanceToCurrentShape = 0;
+
+        if (game->distanceToNextElement > (CLevel::kSegmentLengthInMeters / 2)) {
+            distanceToCurrentShape = (CLevel::kSegmentLengthInMeters - game->distanceToNextElement);
+        } else {
+            distanceToCurrentShape = (game->distanceToNextElement);
+        }
+
+        int halfScreenHeight = yRes / 2;
+
+        int slopeAddedLines = ( (2 * CLevel::kSlopeHeightInMeters * slopeDelta * distanceToCurrentShape) / (CLevel::kSegmentLengthInMeters) );
+
+        int modulus = static_cast<int>(game->mHeading * xRes) % xRes;
+
+        while (modulus < 0) {
+            modulus += xRes;
+        }
+
+        modulus = 0;
+
+        int shadingStripesCount = 0;
 
 
-                int numberOfStripeShades = 4;
-                float completelyArbitraryCurveEasingFactor = 100.0f;
-                int shapeDelta = 0;
-                float roadWidth = 1.0f;
-                char shape = game->track[game->elementIndex];
-                char slope = game->slopes[game->elementIndex];
-                auto camera = Vec3( 0.5f * (game->x)/ 640.0f, 0.2f, 0.1f * ( game->carSpeed / 50.0f ) );
+        if (mDrawBackdrop) {
+            drawBackdropForHeading( modulus, game->zone );
+        } else {
+            renderer->drawSquare(0, 0, xRes, halfScreenHeight - slopeAddedLines, {0, 0, 0, 255});
+        }
 
-                if (shape == ')') {
-                    shapeDelta = -1;
-                }
+        renderer->drawSquare(0, halfScreenHeight - slopeAddedLines, xRes, yRes, {0, 64, 0, 255});
 
-                if (shape == '(') {
-                    shapeDelta = 1;
-                }
+        Vec2 previousLeft(-1, -1);
+        Vec2 previousRight(-1, -1);
 
-                float slopeDelta = 0;
+        shadingStripesCount = 0;
 
-                if (slope == '/') {
-                    slopeDelta = 1;
-                }
-
-                if (slope == '\\') {
-                    slopeDelta = -1;
-                }
-
-                int distanceToCurrentShape = 0;
-
-                if (game->distanceToNextElement > (CLevel::kSegmentLengthInMeters/2)) {
-                    distanceToCurrentShape = (CLevel::kSegmentLengthInMeters - game->distanceToNextElement);
-                } else {
-                    distanceToCurrentShape = (game->distanceToNextElement);
-                }
-
-                int halfScreenHeight = 480 / 2;
-
-                auto slopeAddedLines = ( 2 * CLevel::kSlopeHeightInMeters * (distanceToCurrentShape/static_cast<float>(CLevel::kSegmentLengthInMeters)) * slopeDelta  );
-
-                int modulus = static_cast<int>(game->mHeading * 640) % 640;
-
-                while ( modulus < 0 ) {
-                    modulus += 640;
-                }
+        int segmentLength = (CLevel::kSegmentLengthInMeters);
 
 
-                drawBackdropForHeading( modulus, game->zone );
-
-                int shadingStripesCount = 0;
-                for (int y = 0; y < halfScreenHeight + slopeAddedLines + 1; ++y ) {
-                    auto line = ( halfScreenHeight - slopeAddedLines ) + y;
+        float initialSlope = getInitialSlope(slopeDelta, distanceToCurrentShape, segmentLength);
 
 
-                    int shade[3] = {0, 64, 0};
-                    renderer->fill( 0, 640, line, 0, 640, line + 1, shade );
-                }
+        float stripeHeightDelta = (-initialSlope) / yRes;
 
-                Vec2 previousLeft(-1, -1);
-                Vec2 previousRight(-1, -1);
+        for (int y = 0; y < halfScreenHeight; ++y) {
 
-                shadingStripesCount = 0;
+            if ( --shadingStripesCount <= 0 ) {
+                shadingStripesCount = 1024;
+            }
 
-                float initialSlope = CLevel::kSlopeHeightInMeters * (distanceToCurrentShape/ static_cast<float>(CLevel::kSegmentLengthInMeters)) * slopeDelta;
-                float currentStripeHeight = initialSlope;
-                float stripeHeightDelta =  (-initialSlope) / 480.0f;
+            auto currentStripeHeight = initialSlope + ((2 * (halfScreenHeight - y)) * stripeHeightDelta);
 
-                for (float y = halfScreenHeight; y > -1; y -= (0.5f )) {
-                    shadingStripesCount = ( shadingStripesCount + 1) % 1024;
+            float curve = getCurve(completelyArbitraryCurveEasingFactor, shapeDelta, distanceToCurrentShape, y);
 
-                    currentStripeHeight = initialSlope + ( (2.0f * (halfScreenHeight - y)) * stripeHeightDelta );
+            Vec2 leftPoint = project(Vec3(FixP{curve} - one, -one + FixP{currentStripeHeight}, FixP{-y}), camera);
+            Vec2 rightPoint = project(Vec3(FixP{curve} + one, -one + FixP{currentStripeHeight}, FixP{-y}), camera);
 
-                    float curve = (distanceToCurrentShape / static_cast<float>(CLevel::kSegmentLengthInMeters)) * shapeDelta * y * y / completelyArbitraryCurveEasingFactor;
-                    auto leftPoint = project(Vec3(-( roadWidth / 2.0f ) + curve, -0.5f + currentStripeHeight, -y), camera);
-                    auto rightPoint = project(Vec3( (roadWidth / 2.0f ) + curve, -0.5f + currentStripeHeight, -y), camera);
+            //if it's valid
+            if (previousLeft.y < 0) {
+                previousLeft = leftPoint;
+                previousRight = rightPoint;
+            }
 
-                    //if it's valid
-                    if ( previousLeft.y < 0 ) {
-                        previousLeft = leftPoint;
-                        previousRight = rightPoint;
-                    }
+            int count = (-shadingStripesCount + (static_cast<long>(game->distanceRan) % ( CLevel::kSegmentLengthInMeters / 2 )  )) % numberOfStripeShades;
 
-                    int count = (- shadingStripesCount + static_cast<long>(game->distanceRan) ) % numberOfStripeShades;
-                    int shade[3] = {255 * ( count + 10 ) / 20, 255 * ( count + 10 ) / 20, 255 * ( count + 10 ) / 20 };
-                    renderer->fill( leftPoint.x, rightPoint.x, leftPoint.y, previousLeft.x, previousRight.x, previousLeft.y, shade );
+            int shade = ((count + 16) * 256) / 32;
 
-                    previousLeft = leftPoint;
-                    previousRight = rightPoint;
-                }
+            int diff = std::abs(static_cast<int>(leftPoint.y) - static_cast<int>(previousLeft.y) );
+            if ( diff < 2) {
+                renderer->drawSquare(
+                                        static_cast<int>(leftPoint.x),
+                                        static_cast<int>(leftPoint.y),
+                                      static_cast<int>(rightPoint.x),
+                                      static_cast<int>(leftPoint.y) + diff,
+                               {shade, shade, shade, 255});
+            } else {
+                renderer->fill(
+                               static_cast<int>(previousLeft.x),
+                               static_cast<int>(previousRight.x),
+                               static_cast<int>(previousLeft.y),
+                               static_cast<int>(leftPoint.x),
+                               static_cast<int>(rightPoint.x),
+                               static_cast<int>(leftPoint.y),
+                               {shade, shade, shade, 255});
 
-                initialSlope = CLevel::kSlopeHeightInMeters * (distanceToCurrentShape/ static_cast<float>(CLevel::kSegmentLengthInMeters)) * slopeDelta;
-                stripeHeightDelta =  (-initialSlope) / 480.0f;
+            }
 
-                auto cars = game->getCarsAhead(1024);
-                auto playerLane = (game->x)/640.0f;
+            previousLeft = leftPoint;
+            previousRight = rightPoint;
+        }
 
-                for ( auto foe : cars ) {
-                    auto y = std::get<0>(foe) - game->distanceRan;
-                    float curve = (distanceToCurrentShape / static_cast<float>(CLevel::kSegmentLengthInMeters)) * shapeDelta * y * y / completelyArbitraryCurveEasingFactor;
+        for (auto foe : game->mCars) {
 
-                    auto lane = std::get<1>(foe);
-                    currentStripeHeight = initialSlope + ( (2.0f * (halfScreenHeight - y + 1)) * stripeHeightDelta );
-                    auto carProjection0 = project( Vec3( curve + lane - 0.2f, -1.0f + currentStripeHeight, -y + 0), camera);
-                    auto carProjection1 = project( Vec3( curve + lane + 0.2f, -1.0f + currentStripeHeight, -y + 0), camera);
-                    currentStripeHeight = initialSlope + ( (2.0f * (halfScreenHeight - y - 1)) * stripeHeightDelta );
-                    auto carProjection2 = project( Vec3( curve + lane - 0.2f, -1.0f + currentStripeHeight, -y - 1), camera);
-                    auto carProjection3 = project( Vec3( curve + lane + 0.2f, -1.0f + currentStripeHeight, -y - 1), camera);
+            int y = std::get<0>(foe) - game->distanceRan;
 
-                    int carSprite = (lane + 0.5) + 1;
-                    int carSize = 0;
+            if ( y < 0 ) {
+                continue;
+            }
 
-                    int sizeX = 32;
-                    int sizeY = 8;
+            float curve = getCurve(completelyArbitraryCurveEasingFactor, shapeDelta, distanceToCurrentShape, y);
 
-                    if ( y <= 5 ) {
-                        carSize = 0;
-                        sizeX = 128;
-                        sizeY = 64;
-                    } else if ( 5 <= y && y <= 25 ) {
-                        carSize = 1;
-                        sizeX = 64;
-                        sizeY = 32;
-                    } else if ( 25 <= y && y <= 75 ) {
-                        carSize = 2;
-                        sizeX = 32;
-                        sizeY = 16;
-                    } else {
-                        continue;
-                    }
+            int lane = std::get<1>(foe);
+            auto curveAndLane = FixP{lane} + FixP{curve};
+            auto fixedStripeHeight = -one + FixP{initialSlope + ((2 * (halfScreenHeight - y - 1)) * stripeHeightDelta)};
+            auto bottom = FixP{-y};
+            Vec2 carProjection0 = project(Vec3(curveAndLane - halfPart, fixedStripeHeight, bottom + zero), camera);
+            Vec2 carProjection1 = project(Vec3(curveAndLane + halfPart, fixedStripeHeight, bottom + zero), camera);
+            Vec2 carProjection2 = project(Vec3(curveAndLane - halfPart, fixedStripeHeight, bottom - one), camera);
+            Vec2 carProjection3 = project(Vec3(curveAndLane + halfPart, fixedStripeHeight, bottom - one), camera);
 
+            int carSprite = std::max( 0, std::min((static_cast<int>(lane) + 1), 2) );
 
-                    int black[3] = {0,0,0};
-                    auto centerX = carProjection0.x + ((carProjection1.x - carProjection0.x) / 2);
-                    auto centerY = carProjection0.y + ((carProjection2.y - carProjection0.y) / 2);
-                    renderer->fill( carProjection0.x, carProjection1.x, carProjection0.y, carProjection2.x, carProjection3.x, centerY, black );
-                    renderer->drawBitmapAt(centerX - (sizeX/2), centerY - (sizeY/2), sizeX, sizeY, mOtherCar[carSprite][carSize]);
-                }
+            int carSize = 0;
 
+            int sizeX = 32;
+            int sizeY = 8;
 
-                {
-                    auto lane = (game->x) / 640.0f;
-                    currentStripeHeight = initialSlope + ( (2.0f * (halfScreenHeight -4.1)) * stripeHeightDelta );
-                    auto carProjection2 = project(Vec3(lane -0.2f, -1.0f + currentStripeHeight, -2 -1.1), camera);
-                    auto carProjection3 = project(Vec3(lane +0.2f, -1.0f + currentStripeHeight, -2 -1.1), camera);
-                    currentStripeHeight = initialSlope + ( (2.0f * (halfScreenHeight -2.1)) * stripeHeightDelta );
-                    auto carProjection0 = project(Vec3(lane -0.2f, -1.0f + currentStripeHeight, -2 -0.1), camera);
-                    auto carProjection1 = project(Vec3(lane +0.2f, -1.0f + currentStripeHeight, -2 -0.1), camera);
+            if (y <= 5) {
+                carSize = 0;
+                sizeX = 128;
+                sizeY = 64;
+            } else if (5 <= y && y <= 25) {
+                carSize = 1;
+                sizeX = 64;
+                sizeY = 32;
+            } else if (25 <= y && y <= 75) {
+                carSize = 2;
+                sizeX = 32;
+                sizeY = 16;
+            } else {
+                continue;
+            }
 
-                    int black[3] = {0,0,0};
-                    auto centerX = carProjection0.x + ((carProjection1.x - carProjection0.x) / 2);
-                    auto centerY = carProjection0.y + ((carProjection2.y - carProjection0.y) / 2);
-                    int carSprite = (lane + 0.5) + 1;
-                    renderer->fill( carProjection0.x, carProjection1.x, carProjection0.y, carProjection2.x, carProjection3.x, centerY, black );
-                    renderer->drawBitmapAt(centerX - 64, centerY - 32, 128, 32, mCar[carSprite][0]);
-
-                    if (game->smoking) {
-                        renderer->drawBitmapAt(centerX - 64, centerY, 100, 33, mSmoke);
-                    }
-                }
+            sizeX = mWidth[ carSprite ][ carSize ];
+            sizeY = mHeight[ carSprite ][ carSize ];
 
 
-        if ( game->hit ) {
-            renderer->playSound( mHitSound );
+            auto centerX = carProjection0.x + ((carProjection1.x - carProjection0.x) / two);
+            auto centerY = carProjection0.y + ((carProjection2.y - carProjection0.y) / two);
+
+            if ( kDrawShadows ) {
+                renderer->fill(static_cast<int>(carProjection0.x),
+                               static_cast<int>(carProjection1.x),
+                               static_cast<int>(carProjection0.y),
+                               static_cast<int>(carProjection2.x),
+                               static_cast<int>(carProjection3.x),
+                               static_cast<int>(centerY),
+                               {0, 0, 0, 0});
+            }
+
+
+            renderer->drawBitmapAt(static_cast<int>(centerX) - (sizeX / 2),
+                                   static_cast<int>(centerY) - (sizeY / 2),
+                                   sizeX,
+                                   sizeY,
+                                   mOtherCar[carSprite][carSize]);
+        }
+
+
+        {
+            auto lane = FixP{game->x} / FixP{xRes};
+
+            auto fixCurrentStripeHeight = FixP{ initialSlope + ((2 * (halfScreenHeight - 4)) * stripeHeightDelta) };
+            Vec2 carProjection2 = project(Vec3(lane - halfPart, -one + fixCurrentStripeHeight, -two - one), camera);
+            Vec2 carProjection3 = project(Vec3(lane + halfPart, -one + fixCurrentStripeHeight, -two - one), camera);
+            Vec2 carProjection0 = project(Vec3(lane - halfPart, -one + fixCurrentStripeHeight, -two), camera);
+            Vec2 carProjection1 = project(Vec3(lane + halfPart, -one + fixCurrentStripeHeight, -two), camera);
+
+            auto centerX = carProjection0.x + ((carProjection1.x - carProjection0.x) / two);
+            auto centerY = carProjection0.y + ((carProjection2.y - carProjection0.y) / two);
+
+            if ( kDrawShadows ) {
+                renderer->fill(static_cast<int>(carProjection0.x),
+                               static_cast<int>(carProjection1.x),
+                               static_cast<int>(carProjection0.y),
+                               static_cast<int>(carProjection2.x),
+                               static_cast<int>(carProjection3.x),
+                               static_cast<int>(centerY),
+                               {0, 0, 0, 0});
+            }
+
+            int carSprite = std::max( 0, std::min((static_cast<int>(lane) + 1), 2) );
+
+            renderer->drawBitmapAt(static_cast<int>(centerX) - (mWidth[ carSprite ][ 0 ] / 2), static_cast<int>(centerY) - (mHeight[ carSprite ][ 0 ] / 2), 128, 32, mCar[carSprite][0]);
+
+            if (game->smoking) {
+                renderer->drawBitmapAt(static_cast<int>(centerX) - (mWidth[ carSprite ][ 0 ] / 2), static_cast<int>(centerY), 100, 33, mSmoke);
+            }
+        }
+
+
+        if (game->hit) {
+            renderer->playSound(mHitSound);
             game->hit = false;
         }
 
-        if ( game->brake ) {
-            renderer->playSound( mBrakeSound );
+        if (game->brake) {
+            renderer->playSound(mBrakeSound);
             game->brake = false;
         }
 
-        if ( game->accel ) {
-            renderer->playSound( mAccelerateSound );
+        if (game->accel) {
+            renderer->playSound(mAccelerateSound);
             game->accel = false;
         }
+
+        auto barWidth = ( xRes * this->mGameSession->getLevel()->timeLeft ) / this->mGameSession->getLevel()->totalTimeForRound;
+        renderer->drawSquare(0, 0, barWidth, 16, {255, 0, 0, 0 } );
     }
 
-	void CGameplayView::onClick( std::pair<int, int> position ) {
-        if ( position.first > 420 ) {
+    float CGameplayView::getInitialSlope(int slopeDelta, int distanceToCurrentShape, int segmentLength) const {
+        return ( CLevel::kSlopeHeightInMeters * distanceToCurrentShape * slopeDelta / segmentLength );
+    }
+
+    float CGameplayView::getCurve(int completelyArbitraryCurveEasingFactor, int shapeDelta, int distanceToCurrentShape, int y) const {
+        return (128 * (distanceToCurrentShape * shapeDelta * y * y )) / (completelyArbitraryCurveEasingFactor * CLevel::kSegmentLengthInMeters) / 128.0f;
+    }
+
+    void CGameplayView::onClick(const std::pair<int, int>& position) {
+        if (position.first > 420) {
             this->mGameSession->getLevel()->onKeyDown(Vipper::ECommand::kRight);
-        } else if ( position.first < 210 ) {
+        } else if (position.first < 210) {
             this->mGameSession->getLevel()->onKeyDown(Vipper::ECommand::kLeft);
         }
 
-        if ( position.second > 320 ) {
+        if (position.second > xHalfRes) {
             this->mGameSession->getLevel()->onKeyDown(Vipper::ECommand::kDown);
-        } else if ( position.second < 160 ) {
+        } else if (position.second < 160) {
             this->mGameSession->getLevel()->onKeyDown(Vipper::ECommand::kUp);
         }
-	}
+    }
 
-	void CGameplayView::onKeyUp( Vipper::ECommand keyCode ) {
+    void CGameplayView::onKeyUp(const Vipper::ECommand& keyCode) {
         this->mGameSession->getLevel()->onKeyUp(keyCode);
-	}
+    }
 
-    void CGameplayView::onKeyDown( Vipper::ECommand keyCode ) {
+    void CGameplayView::onKeyDown(const Vipper::ECommand& keyCode) {
         this->mGameSession->getLevel()->onKeyDown(keyCode);
     }
 }

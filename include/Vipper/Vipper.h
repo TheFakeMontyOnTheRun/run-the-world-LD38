@@ -1,6 +1,7 @@
 #include <string>
 #include <set>
 #include <vector>
+#include <functional>
 #include <memory>
 
 #include "IRenderer.h"

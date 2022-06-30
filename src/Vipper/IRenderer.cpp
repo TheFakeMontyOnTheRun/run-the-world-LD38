@@ -32,19 +32,19 @@ namespace Vipper {
 		mKeyListeners.erase( std::remove( mKeyListeners.begin(), mKeyListeners.end(), listener ), mKeyListeners.end() );		
 	}
 
-	void IRenderer::dispatchKeyUpToListeners( Vipper::ECommand keyCode ) {
+	void IRenderer::dispatchKeyUpToListeners( const Vipper::ECommand& keyCode ) {
 		for ( auto& listener : mKeyListeners ) {	
 			listener->onKeyUp( keyCode );
 		}
 	}
 
-	void IRenderer::dispatchKeyDownToListeners( Vipper::ECommand keyCode ) {
+	void IRenderer::dispatchKeyDownToListeners( const Vipper::ECommand& keyCode ) {
 		for ( auto& listener : mKeyListeners ) {
 			listener->onKeyDown( keyCode );
 		}
 	}
 		
-	void IRenderer::dispatchClickToListeners( std::pair<int, int > pointerPosition ) {
+	void IRenderer::dispatchClickToListeners( const std::pair<int, int >& pointerPosition ) {
 		for ( auto& listener : mClickListeners ) {	
 			listener->onClick( pointerPosition );
 		}

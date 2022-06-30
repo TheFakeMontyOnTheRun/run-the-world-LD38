@@ -4,20 +4,20 @@
 namespace RunTheWorld {
 
     struct Vec3 {
-        Vec3(float aX, float aY, float aZ) : x(aX), y(aY), z(aZ) {
+        Vec3(FixP aX, FixP aY, FixP aZ) : x(aX), y(aY), z(aZ) {
         }
 
-        float x = 0;
-        float y = 0;
-        float z = 0;
+        FixP x = 0;
+        FixP y = 0;
+        FixP z = 0;
     };
 
     struct Vec2 {
-        Vec2(float aX, float aY) : x(aX), y(aY) {
+        Vec2(FixP aX, FixP aY) : x(aX), y(aY) {
         }
 
-        float x = 0;
-        float y = 0;
+        FixP x = 0;
+        FixP y = 0;
     };
 
   class CGameplayView : public Vipper::IView, public Vipper::IRenderer::IClickListener, public Vipper::IRenderer::IKeyListener {
@@ -28,6 +28,8 @@ namespace RunTheWorld {
       Vipper::IRenderer::BitmapId mSmoke;
       Vipper::IRenderer::BitmapId mCar[3][3];
       Vipper::IRenderer::BitmapId mOtherCar[3][3];
+      int mWidth[3][3];
+      int mHeight[3][3];
 
     Vipper::IRenderer::SoundId mHitSound;
       Vipper::IRenderer::SoundId mAccelerateSound;
@@ -36,15 +38,22 @@ namespace RunTheWorld {
     Vipper::IRenderer::FontId mUIFont;
 
   public:
+      bool mDrawBackdrop = true;
     explicit CGameplayView(std::shared_ptr<CGameSession> session, std::shared_ptr<Vipper::IRenderer> renderer);
     void drawTextAt( std::pair<int, int> position, std::string text );
     void drawGaugeAt( std::pair<int, int> position, int howFilled);
     std::pair<int, int> getLastClick();
     void show() override;
-    void onClick( std::pair< int, int> position ) override;
-    void onKeyUp( Vipper::ECommand keyCode ) override;
-      void onKeyDown( Vipper::ECommand keyCode ) override;
+    void onClick( const std::pair< int, int>& position ) override;
+    void onKeyUp( const Vipper::ECommand& keyCode ) override;
+      void onKeyDown( const Vipper::ECommand& keyCode ) override;
       void drawBackdropForHeading(int modulus, int zone  );
+      FixP mCameraHeight{ 10 };
+      FixP mCameraHeightIncrements{ 0.1f };
+
+      float getCurve(int completelyArbitraryCurveEasingFactor, int shapeDelta, int distanceToCurrentShape, int y) const;
+
+      float getInitialSlope(int slopeDelta, int distanceToCurrentShape, int segmentLength) const;
   };
 }
 #endif

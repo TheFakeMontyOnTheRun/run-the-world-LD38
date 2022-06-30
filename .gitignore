@@ -27,3 +27,14 @@
 *.exe
 *.out
 *.app
+game.data
+game.html
+game.js
+game.wasm
+.idea
+cmake-build-debug
+CWSDPMI.SWP
+index.data
+index.html
+index.html.mem
+index.js

@@ -9,7 +9,7 @@ find_package(SDL_image REQUIRED)
 find_package(SDL_ttf REQUIRED)
 
 
-include_directories(include
+include_directories(include fixed_point/include
         ${SDL_INCLUDE_DIRS} ${SDL_MIXER_INCLUDE_DIRS} ${SDL_IMAGE_INCLUDE_DIRS} ${SDL_TTF_INCLUDE_DIRS})
 
 set(SOURCE_FILES

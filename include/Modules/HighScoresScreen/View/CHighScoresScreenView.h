@@ -11,9 +11,9 @@ namespace RunTheWorld {
 		explicit CHighScoresScreenView(std::shared_ptr<Vipper::IRenderer> renderer);
 		
 		void show() override;
-		void onClick( std::pair<int, int> position ) override;
-		void onKeyUp( Vipper::ECommand keyCode ) override;
-		void onKeyDown( Vipper::ECommand keyCode ) override;
+		void onClick( const std::pair<int, int>& position ) override;
+		void onKeyUp( const Vipper::ECommand& keyCode ) override;
+		void onKeyDown( const Vipper::ECommand& keyCode ) override;
 	};
 }
 #endif

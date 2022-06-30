@@ -5,7 +5,7 @@
 
 namespace RunTheWorld {
 
-    using CCar = std::tuple<float, float, float>;
+    using CCar = std::tuple<int, int, int>;
 
     class CLevel : public Vipper::IRenderer::IKeyListener {
     public:
@@ -16,16 +16,17 @@ namespace RunTheWorld {
 
         EGameState gameState = EGameState::kTitleScreen;
 
-        static const int kSegmentLengthInMeters = 1000;
-        static const int kSlopeHeightInMeters = 100;
+        static const int kSegmentLengthInMeters = 512;
+        static const int kSlopeHeightInMeters = 32;
         static const int kZones = 3;
         bool smoking = false;
         float x = 0;
         float xSpeed = 0;
         float mHeading = 0;
         int carSpeed = 0;
-        int zone = 0;
-        long timeLeft = 90000;
+        int zone = 2;
+        long timeLeft = 100000;
+        long totalTimeForRound = 100000;
         //20 seconds per segment is quite fair
         std::array<char, 3>  track =   {{'(' , ')', ')'}};
         std::array<char, 3>  slopes = {{'/' , '\\', '_' }};
@@ -45,8 +46,8 @@ namespace RunTheWorld {
 
         std::vector<CCar> getCarsAhead( int range ) const;
 
-        void onKeyUp( Vipper::ECommand keyCode );
-        void onKeyDown( Vipper::ECommand keyCode );
+        void onKeyUp( const Vipper::ECommand& keyCode );
+        void onKeyDown( const Vipper::ECommand& keyCode );
         bool isOver();
         bool mIsOver = false;
         bool hit = false;
